@@ -72,6 +72,50 @@
       </div>
     </section>
 
+    <!-- Pricing Section -->
+    <section class="pricing-section">
+      <h2 class="section-title">Simple, transparent pricing</h2>
+      <div class="pricing-content">
+        <div class="pricing-card">
+          <div class="pricing-amount">$25</div>
+          <div class="pricing-description">/ question asked to an influencer</div>
+          <div class="pricing-features">
+            <div class="pricing-feature">
+              <span class="feature-icon">✓</span>
+              <span class="feature-text">7 days delivery</span>
+            </div>
+            <div class="pricing-feature">
+              <span class="feature-icon">✓</span>
+              <span class="feature-text">Verified influencer profiles</span>
+            </div>
+            <div class="pricing-feature">
+              <span class="feature-icon">✓</span>
+              <span class="feature-text">Online expert support</span>
+            </div>
+            <div class="pricing-feature">
+              <span class="feature-icon">✓</span>
+              <span class="feature-text">Preview before you pay</span>
+            </div>
+            <div class="pricing-feature">
+              <span class="feature-icon">✓</span>
+              <span class="feature-text">PDF report</span>
+            </div>
+          </div>
+          <div class="pricing-examples">
+            <h3 class="examples-title">Examples</h3>
+            <div class="example-item">
+              <div class="example-details">3 questions to 10 influencers</div>
+              <div class="example-price">$750</div>
+            </div>
+            <div class="example-item">
+              <div class="example-details">5 questions to 50 influencers</div>
+              <div class="example-price">$5,250</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- FAQ Section -->
     <section class="faq-section">
       <h2 class="section-title">❓ Frequently Asked Questions</h2>
@@ -364,6 +408,113 @@ import AccordionContent from 'primevue/accordioncontent'
   margin: 0;
 }
 
+/* Pricing Section */
+.pricing-section {
+  padding: 60px 24px;
+  background-color: #f8f9fa;
+}
+
+.pricing-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.pricing-card {
+  background: white;
+  padding: 40px 32px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.pricing-amount {
+  font-size: 56px;
+  font-weight: 700;
+  color: #6348ed;
+  margin: 0 0 8px 0;
+  line-height: 1;
+}
+
+.pricing-description {
+  font-size: 18px;
+  line-height: 1.5;
+  color: #666;
+  margin: 0 0 24px 0;
+}
+
+.pricing-features {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pricing-feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.feature-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #6348ed;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.feature-text {
+  font-size: 15px;
+  line-height: 1.4;
+  color: #1a1a1a;
+}
+
+.pricing-examples {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e9ecef;
+}
+
+.examples-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+  text-align: center;
+}
+
+.example-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.example-item:last-child {
+  border-bottom: none;
+}
+
+.example-details {
+  font-size: 15px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.example-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #6348ed;
+}
+
 /* FAQ Section */
 .faq-section {
   padding: 80px 24px;
@@ -463,8 +614,62 @@ import AccordionContent from 'primevue/accordioncontent'
 
   .steps-section,
   .benefits-section,
+  .pricing-section,
   .faq-section {
-    padding: 60px 20px;
+    padding: 50px 20px;
+  }
+
+  .pricing-amount {
+    font-size: 48px;
+  }
+
+  .pricing-description {
+    font-size: 18px;
+  }
+
+  .pricing-card {
+    padding: 32px 20px;
+  }
+
+  .pricing-amount {
+    font-size: 42px;
+  }
+
+  .pricing-description {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .pricing-features {
+    margin-top: 20px;
+    padding-top: 20px;
+    gap: 10px;
+  }
+
+  .feature-text {
+    font-size: 14px;
+  }
+
+  .pricing-examples {
+    margin-top: 20px;
+    padding-top: 20px;
+  }
+
+  .examples-title {
+    font-size: 16px;
+    margin-bottom: 14px;
+  }
+
+  .example-item {
+    padding: 10px 0;
+  }
+
+  .example-details {
+    font-size: 14px;
+  }
+
+  .example-price {
+    font-size: 16px;
   }
 
   .cta-section {
