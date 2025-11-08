@@ -2,16 +2,18 @@
   <div class="home-page">
     <!-- Hero Section -->
     <section class="hero">
-      <div class="hero-content">
-        <div class="hero-text">
-          <h1 class="hero-title">Get real insights from influencers — powered by A.I.</h1>
-          <p class="hero-description">
-            Influanswers uses artificial intelligence to survey hundreds of influencers and deliver
-            high-quality, actionable insights about your brand or business.
-          </p>
-        </div>
-        <div class="hero-image">
-          <img src="/img/market-research.jpg" alt="Market Research" />
+      <div class="hero-container">
+        <div class="hero-content">
+          <div class="hero-text">
+            <h1 class="hero-title">Get real insights from influencers — powered by A.I.</h1>
+            <p class="hero-description">
+              Influanswers uses artificial intelligence to survey hundreds of influencers and
+              deliver high-quality, actionable insights about your brand or business.
+            </p>
+          </div>
+          <div class="hero-image">
+            <img src="/img/influanswers-hero.png" alt="Market Research" />
+          </div>
         </div>
       </div>
     </section>
@@ -266,9 +268,14 @@ import AccordionContent from 'primevue/accordioncontent'
 
 /* Hero Section */
 .hero {
-  padding: 80px 24px;
+  width: 100%;
+  background-color: #f5f3ff;
+}
+
+.hero-container {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 80px 24px;
 }
 
 .hero-content {
@@ -600,7 +607,7 @@ import AccordionContent from 'primevue/accordioncontent'
 }
 
 @media (max-width: 640px) {
-  .hero {
+  .hero-container {
     padding: 60px 20px;
   }
 
