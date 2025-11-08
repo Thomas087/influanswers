@@ -42,18 +42,6 @@
         />
       </div>
 
-      <div class="form-field form-field--full">
-        <label class="field-label" for="questions">What do you need to ask?</label>
-        <Textarea
-          id="questions"
-          :modelValue="modelValue.questions"
-          @update:modelValue="updateField('questions', $event)"
-          rows="4"
-          auto-resize
-          placeholder="Share the questions or themes you want influencers to explore."
-        />
-      </div>
-
       <div class="form-field">
         <label class="field-label" for="budget-range">Budget range</label>
         <Dropdown
@@ -104,11 +92,16 @@ const budgetOptions = [
 
 const timelineOptions = ['Within 1 week', '2 weeks', '3-4 weeks', '1-2 months', 'Flexible']
 
-const updateField = <K extends keyof BriefDetails>(field: K, value: BriefDetails[K]) => {
-  emit('update:modelValue', {
-    ...props.modelValue,
-    [field]: value,
-  })
+const updateField = <K extends keyof BriefDetails>(
+  field: K,
+  value: BriefDetails[K] | undefined,
+) => {
+  if (value !== undefined) {
+    emit('update:modelValue', {
+      ...props.modelValue,
+      [field]: value,
+    })
+  }
 }
 </script>
 

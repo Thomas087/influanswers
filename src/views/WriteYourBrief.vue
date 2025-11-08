@@ -34,8 +34,9 @@
           <StepPanels>
             <StepPanel v-for="step in steps" :key="step.value" :value="step.value">
               <WriteBriefStep v-if="step.value === 1" v-model="brief" />
-              <SelectInfluencersStep v-else-if="step.value === 2" v-model="selection" />
-              <ConfirmStep v-else-if="step.value === 3" :brief="brief" :selection="selection">
+              <QuestionsStep v-else-if="step.value === 2" v-model="brief" />
+              <SelectInfluencersStep v-else-if="step.value === 3" v-model="selection" />
+              <ConfirmStep v-else-if="step.value === 4" :brief="brief" :selection="selection">
                 <template #actions>
                   <div class="logistics-actions">
                     <p>{{ step.slot }}</p>
@@ -82,6 +83,7 @@ import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
 
 import ConfirmStep from '@/components/brief/ConfirmStep.vue'
+import QuestionsStep from '@/components/brief/QuestionsStep.vue'
 import SelectInfluencersStep from '@/components/brief/SelectInfluencersStep.vue'
 import WriteBriefStep from '@/components/brief/WriteBriefStep.vue'
 import type { BriefDetails, InfluencerSelection } from '@/types/brief'
@@ -111,11 +113,15 @@ const isBriefValid = computed(
   () => brief.projectName.trim() && brief.brandSummary.trim() && brief.keyObjectives.trim(),
 )
 
+const isQuestionsValid = computed(() => brief.questions.trim().length > 0)
+
 const isSelectionValid = computed(
   () => selection.platforms.length > 0 || selection.categories.length > 0,
 )
 
-const canSubmit = computed(() => isBriefValid.value && isSelectionValid.value)
+const canSubmit = computed(
+  () => isBriefValid.value && isQuestionsValid.value && isSelectionValid.value,
+)
 
 const steps = computed(() => [
   {
@@ -131,6 +137,17 @@ const steps = computed(() => [
   },
   {
     value: 2,
+    label: 'Specify your questions',
+    showBack: true,
+    nextLabel: 'Continue',
+    nextIcon: 'pi pi-arrow-right',
+    nextIconPos: 'right',
+    nextSeverity: undefined,
+    isSubmit: false,
+    isDisabled: computed(() => !isQuestionsValid.value),
+  },
+  {
+    value: 3,
     label: 'Select your influencers',
     showBack: true,
     nextLabel: 'Continue',
@@ -141,7 +158,7 @@ const steps = computed(() => [
     isDisabled: computed(() => !isSelectionValid.value),
   },
   {
-    value: 3,
+    value: 4,
     label: 'Confirm',
     slot: 'Once you submit, our team will validate the audience, finalize pricing, and share a proposal.',
     showBack: true,
