@@ -26,72 +26,40 @@
       <section class="stepper-section">
         <Stepper v-model:value="activeStep" linear>
           <StepList>
-            <Step :value="1">Write your brief</Step>
-            <Step :value="2">Select your influencers</Step>
-            <Step :value="3">Confirm</Step>
+            <Step v-for="step in steps" :key="step.value" :value="step.value">
+              {{ step.label }}
+            </Step>
           </StepList>
 
           <StepPanels>
-            <StepPanel :value="1">
-              <WriteBriefStep v-model="brief" />
-              <div class="step-footer">
-                <div></div>
-                <Button
-                  label="Continue"
-                  icon="pi pi-arrow-right"
-                  icon-pos="right"
-                  :disabled="!isBriefValid"
-                  @click="activeStep = 2"
-                />
-              </div>
-            </StepPanel>
-
-            <StepPanel :value="2">
-              <SelectInfluencersStep v-model="selection" />
-              <div class="step-footer">
-                <Button
-                  label="Back"
-                  icon="pi pi-arrow-left"
-                  severity="secondary"
-                  outlined
-                  @click="activeStep = 1"
-                />
-                <Button
-                  label="Continue"
-                  icon="pi pi-arrow-right"
-                  icon-pos="right"
-                  :disabled="!isSelectionValid"
-                  @click="activeStep = 3"
-                />
-              </div>
-            </StepPanel>
-
-            <StepPanel :value="3">
-              <ConfirmStep :brief="brief" :selection="selection">
+            <StepPanel v-for="step in steps" :key="step.value" :value="step.value">
+              <WriteBriefStep v-if="step.value === 1" v-model="brief" />
+              <SelectInfluencersStep v-else-if="step.value === 2" v-model="selection" />
+              <ConfirmStep v-else-if="step.value === 3" :brief="brief" :selection="selection">
                 <template #actions>
                   <div class="logistics-actions">
-                    <p>
-                      Once you submit, our team will validate the audience, finalize pricing, and
-                      share a proposal.
-                    </p>
+                    <p>{{ step.slot }}</p>
                   </div>
                 </template>
               </ConfirmStep>
               <div class="step-footer">
+                <div v-if="!step.showBack"></div>
                 <Button
+                  v-if="step.showBack"
                   label="Back"
                   icon="pi pi-arrow-left"
                   severity="secondary"
                   outlined
-                  @click="activeStep = 2"
+                  @click="prevStep"
                 />
                 <Button
-                  label="Submit brief"
-                  icon="pi pi-check"
-                  severity="success"
-                  :loading="isSubmitting"
-                  :disabled="!canSubmit || isSubmitting"
-                  @click="submitBrief"
+                  :label="step.nextLabel"
+                  :icon="step.nextIcon"
+                  :icon-pos="step.nextIconPos"
+                  :severity="step.nextSeverity"
+                  :loading="step.isSubmit && isSubmitting"
+                  :disabled="step.isDisabled?.value || (step.isSubmit && isSubmitting)"
+                  @click="step.isSubmit ? submitBrief() : nextStep()"
                 />
               </div>
             </StepPanel>
@@ -148,6 +116,51 @@ const isSelectionValid = computed(
 )
 
 const canSubmit = computed(() => isBriefValid.value && isSelectionValid.value)
+
+const steps = computed(() => [
+  {
+    value: 1,
+    label: 'Write your brief',
+    showBack: false,
+    nextLabel: 'Continue',
+    nextIcon: 'pi pi-arrow-right',
+    nextIconPos: 'right',
+    nextSeverity: undefined,
+    isSubmit: false,
+    isDisabled: computed(() => !isBriefValid.value),
+  },
+  {
+    value: 2,
+    label: 'Select your influencers',
+    showBack: true,
+    nextLabel: 'Continue',
+    nextIcon: 'pi pi-arrow-right',
+    nextIconPos: 'right',
+    nextSeverity: undefined,
+    isSubmit: false,
+    isDisabled: computed(() => !isSelectionValid.value),
+  },
+  {
+    value: 3,
+    label: 'Confirm',
+    slot: 'Once you submit, our team will validate the audience, finalize pricing, and share a proposal.',
+    showBack: true,
+    nextLabel: 'Submit brief',
+    nextIcon: 'pi pi-check',
+    nextIconPos: undefined,
+    nextSeverity: 'success',
+    isSubmit: true,
+    isDisabled: computed(() => !canSubmit.value),
+  },
+])
+
+const nextStep = () => {
+  if (activeStep.value < steps.value.length) activeStep.value++
+}
+
+const prevStep = () => {
+  if (activeStep.value > 1) activeStep.value--
+}
 
 const submitBrief = async () => {
   if (!canSubmit.value || isSubmitting.value) return
