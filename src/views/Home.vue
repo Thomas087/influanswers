@@ -20,98 +20,101 @@
 
     <!-- 3 Steps Section -->
     <section class="steps-section">
-      <h2 class="section-title">Get your answers in 3 simple steps</h2>
-      <div class="steps-grid">
-        <div class="step-card">
-          <div class="step-icon">
-            <img src="/icon/brief.svg" alt="Brief icon" />
+      <div class="steps-container">
+        <h2 class="section-title">Get your answers in 3 simple steps</h2>
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-icon">
+              <img src="/icon/brief.svg" alt="Brief icon" />
+            </div>
+            <h3 class="step-title">Define your brief</h3>
+            <p class="step-description">What do you want to know about your brand?</p>
           </div>
-          <h3 class="step-title">Define your brief</h3>
-          <p class="step-description">What do you want to know about your brand?</p>
-        </div>
-        <div class="step-card">
-          <div class="step-icon">
-            <img src="/icon/target.svg" alt="Target icon" />
+          <div class="step-card">
+            <div class="step-icon">
+              <img src="/icon/target.svg" alt="Target icon" />
+            </div>
+            <h3 class="step-title">Choose your audience</h3>
+            <p class="step-description">
+              Select influencers or customers by location, size, niche, or past collaborations.
+            </p>
           </div>
-          <h3 class="step-title">Choose your audience</h3>
-          <p class="step-description">
-            Select influencers or customers by location, size, niche, or past collaborations.
-          </p>
-        </div>
-        <div class="step-card">
-          <div class="step-icon">
-            <img src="/icon/report.svg" alt="Report icon" />
+          <div class="step-card">
+            <div class="step-icon">
+              <img src="/icon/report.svg" alt="Report icon" />
+            </div>
+            <h3 class="step-title">Receive your report</h3>
+            <p class="step-description">
+              Get detailed, data-backed answers to your questions within 7 days.
+            </p>
           </div>
-          <h3 class="step-title">Receive your report</h3>
-          <p class="step-description">
-            Get detailed, data-backed answers to your questions within 7 days.
-          </p>
         </div>
       </div>
     </section>
 
     <!-- Why Brands Love Section -->
     <section class="benefits-section">
-      <h2 class="section-title">Why brands love Influanswers</h2>
-      <div class="benefits-grid">
-        <div class="benefit-card">
-          <div class="benefit-icon">💰</div>
-          <h3 class="benefit-title">Transparent pricing</h3>
-          <p class="benefit-description">Pay only for the number of questions and respondents.</p>
-        </div>
-        <div class="benefit-card">
-          <div class="benefit-icon">✅</div>
-          <h3 class="benefit-title">Result guarantee</h3>
-          <p class="benefit-description">Preview your report before paying the full amount.</p>
-        </div>
-        <div class="benefit-card">
-          <div class="benefit-icon">🚀</div>
-          <h3 class="benefit-title">Scalable service</h3>
-          <p class="benefit-description">
-            From 10 to 1,000+ influencers or customers, tailored to your needs.
-          </p>
+      <div class="benefits-container">
+        <h2 class="section-title">Why brands love Influanswers</h2>
+        <div class="benefits-grid">
+          <div class="benefit-card">
+            <h3 class="benefit-title">Transparent pricing</h3>
+            <p class="benefit-description">Pay only for the number of questions and respondents.</p>
+          </div>
+          <div class="benefit-card">
+            <h3 class="benefit-title">Result guarantee</h3>
+            <p class="benefit-description">Preview your report before paying the full amount.</p>
+          </div>
+          <div class="benefit-card">
+            <h3 class="benefit-title">Scalable service</h3>
+            <p class="benefit-description">
+              From 10 to 1,000+ influencers or customers, tailored to your needs.
+            </p>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- Pricing Section -->
     <section class="pricing-section">
-      <h2 class="section-title">Simple, transparent pricing</h2>
-      <div class="pricing-content">
-        <div class="pricing-card">
-          <div class="pricing-amount">$25</div>
-          <div class="pricing-description">/ question asked to an influencer</div>
-          <div class="pricing-features">
-            <div class="pricing-feature">
-              <span class="feature-icon">✓</span>
-              <span class="feature-text">7 days delivery</span>
+      <div class="pricing-container">
+        <h2 class="section-title">Simple, transparent pricing</h2>
+        <div class="pricing-content">
+          <div class="pricing-card">
+            <div class="pricing-amount">$25</div>
+            <div class="pricing-description">/ question asked to an influencer</div>
+            <div class="pricing-features">
+              <div class="pricing-feature">
+                <span class="feature-icon">✓</span>
+                <span class="feature-text">7 days delivery</span>
+              </div>
+              <div class="pricing-feature">
+                <span class="feature-icon">✓</span>
+                <span class="feature-text">Verified influencer profiles</span>
+              </div>
+              <div class="pricing-feature">
+                <span class="feature-icon">✓</span>
+                <span class="feature-text">Online expert support</span>
+              </div>
+              <div class="pricing-feature">
+                <span class="feature-icon">✓</span>
+                <span class="feature-text">Preview before you pay</span>
+              </div>
+              <div class="pricing-feature">
+                <span class="feature-icon">✓</span>
+                <span class="feature-text">PDF report</span>
+              </div>
             </div>
-            <div class="pricing-feature">
-              <span class="feature-icon">✓</span>
-              <span class="feature-text">Verified influencer profiles</span>
-            </div>
-            <div class="pricing-feature">
-              <span class="feature-icon">✓</span>
-              <span class="feature-text">Online expert support</span>
-            </div>
-            <div class="pricing-feature">
-              <span class="feature-icon">✓</span>
-              <span class="feature-text">Preview before you pay</span>
-            </div>
-            <div class="pricing-feature">
-              <span class="feature-icon">✓</span>
-              <span class="feature-text">PDF report</span>
-            </div>
-          </div>
-          <div class="pricing-examples">
-            <h3 class="examples-title">Examples</h3>
-            <div class="example-item">
-              <div class="example-details">3 questions to 10 influencers</div>
-              <div class="example-price">$750</div>
-            </div>
-            <div class="example-item">
-              <div class="example-details">5 questions to 50 influencers</div>
-              <div class="example-price">$5,250</div>
+            <div class="pricing-examples">
+              <h3 class="examples-title">Examples</h3>
+              <div class="example-item">
+                <div class="example-details">3 questions to 10 influencers</div>
+                <div class="example-price">$750</div>
+              </div>
+              <div class="example-item">
+                <div class="example-details">5 questions to 50 influencers</div>
+                <div class="example-price">$5,250</div>
+              </div>
             </div>
           </div>
         </div>
@@ -321,8 +324,14 @@ import AccordionContent from 'primevue/accordioncontent'
 
 /* Steps Section */
 .steps-section {
+  width: 100%;
+  background-color: white;
+}
+
+.steps-container {
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 80px 24px;
-  background-color: #f8f9fa;
 }
 
 .section-title {
@@ -334,8 +343,6 @@ import AccordionContent from 'primevue/accordioncontent'
 }
 
 .steps-grid {
-  max-width: 1200px;
-  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 40px;
@@ -380,20 +387,29 @@ import AccordionContent from 'primevue/accordioncontent'
 
 /* Benefits Section */
 .benefits-section {
-  padding: 80px 24px;
+  width: 100%;
+  background-color: #f8f9fa;
+}
+
+.benefits-container {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 50px 24px;
+}
+
+.benefits-container .section-title {
+  margin-bottom: 40px;
 }
 
 .benefits-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
+  gap: 30px;
 }
 
 .benefit-card {
   text-align: center;
-  padding: 32px 24px;
+  padding: 24px 20px;
 }
 
 .benefit-icon {
@@ -402,23 +418,29 @@ import AccordionContent from 'primevue/accordioncontent'
 }
 
 .benefit-title {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
   color: #1a1a1a;
-  margin: 0 0 12px 0;
+  margin: 0 0 8px 0;
 }
 
 .benefit-description {
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.5;
   color: #666;
   margin: 0;
 }
 
 /* Pricing Section */
 .pricing-section {
+  width: 100%;
+  background-color: white;
+}
+
+.pricing-container {
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 60px 24px;
-  background-color: #f8f9fa;
 }
 
 .pricing-content {
@@ -549,6 +571,7 @@ import AccordionContent from 'primevue/accordioncontent'
   text-align: center;
   max-width: 800px;
   margin: 0 auto;
+  background-color: white;
 }
 
 .cta-title {
@@ -619,9 +642,33 @@ import AccordionContent from 'primevue/accordioncontent'
     font-size: 18px;
   }
 
-  .steps-section,
-  .benefits-section,
-  .pricing-section,
+  .steps-container,
+  .benefits-container {
+    padding: 40px 20px;
+  }
+
+  .benefits-container .section-title {
+    margin-bottom: 30px;
+  }
+
+  .benefits-grid {
+    gap: 24px;
+  }
+
+  .benefit-card {
+    padding: 20px 16px;
+  }
+
+  .benefit-title {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  .benefit-description {
+    font-size: 14px;
+  }
+
+  .pricing-container,
   .faq-section {
     padding: 50px 20px;
   }
