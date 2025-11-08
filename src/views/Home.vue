@@ -1,7 +1,25 @@
 <template>
   <div class="home-page">
+    <header class="top-nav">
+      <div class="nav-container">
+        <a class="nav-logo" href="#hero">
+          <img src="/influanswers-logo.png" alt="Influanswers logo" />
+        </a>
+        <nav class="nav-links">
+          <a class="nav-link" href="#hero">Home</a>
+          <a class="nav-link" href="#steps">How it works</a>
+          <a class="nav-link" href="#clients">Our clients</a>
+          <a class="nav-link" href="#pricing">Pricing</a>
+          <a class="nav-link" href="#faq">FAQ</a>
+        </nav>
+        <div class="nav-actions">
+          <a class="nav-button nav-button--ghost" href="/login">Login</a>
+          <a class="nav-button nav-button--primary" href="/brief">Write your brief</a>
+        </div>
+      </div>
+    </header>
     <!-- Hero Section -->
-    <section class="hero">
+    <section id="hero" class="hero">
       <div class="hero-container">
         <div class="hero-content">
           <div class="hero-text">
@@ -19,7 +37,7 @@
     </section>
 
     <!-- 3 Steps Section -->
-    <section class="steps-section">
+    <section id="steps" class="steps-section">
       <div class="steps-container">
         <h2 class="section-title">Get your answers in 3 simple steps</h2>
         <div class="steps-grid">
@@ -53,7 +71,7 @@
     </section>
 
     <!-- Our Clients Section -->
-    <section class="clients-section">
+    <section id="clients" class="clients-section">
       <div class="clients-container">
         <h2 class="section-title">Our clients</h2>
         <div class="clients-grid">
@@ -80,7 +98,7 @@
     </section>
 
     <!-- Why Brands Love Section -->
-    <section class="benefits-section">
+    <section id="benefits" class="benefits-section">
       <div class="benefits-container">
         <h2 class="section-title">Why brands love Influanswers</h2>
         <div class="benefits-grid">
@@ -103,7 +121,7 @@
     </section>
 
     <!-- Pricing Section -->
-    <section class="pricing-section">
+    <section id="pricing" class="pricing-section">
       <div class="pricing-container">
         <h2 class="section-title">Simple, transparent pricing</h2>
         <div class="pricing-content">
@@ -151,7 +169,7 @@
     </section>
 
     <!-- FAQ Section -->
-    <section class="faq-section">
+    <section id="faq" class="faq-section">
       <h2 class="section-title">Frequently Asked Questions</h2>
       <div class="faq-list">
         <div class="card">
@@ -276,11 +294,13 @@
 
     <!-- CTA Section -->
     <section class="cta-section">
-      <h2 class="cta-title">Start your brief today</h2>
-      <p class="cta-description">
-        Get honest, data-driven answers about your brand — in just a few clicks.
-      </p>
-      <button class="cta-button">Get Started</button>
+      <div class="cta-container">
+        <h2 class="cta-title">Start your brief today</h2>
+        <p class="cta-description">
+          Get honest, data-driven answers about your brand — in just a few clicks.
+        </p>
+        <button class="cta-button">Get Started</button>
+      </div>
     </section>
   </div>
 </template>
@@ -293,6 +313,103 @@ import AccordionContent from 'primevue/accordioncontent'
 </script>
 
 <style scoped>
+.top-nav {
+  width: 100%;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e9ecef;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-decoration: none;
+}
+
+.nav-logo img {
+  height: 24px;
+  width: auto;
+  display: block;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-link {
+  font-size: 15px;
+  font-weight: 500;
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #1a1a1a;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.nav-button--ghost {
+  color: #6348ed;
+  border: 1px solid rgba(99, 72, 237, 0.4);
+  background-color: transparent;
+}
+
+.nav-button--ghost:hover {
+  border-color: #6348ed;
+  background-color: rgba(99, 72, 237, 0.08);
+}
+
+.nav-button--primary {
+  color: #ffffff;
+  background-color: #6348ed;
+  border: 1px solid #6348ed;
+}
+
+.nav-button--primary:hover {
+  background-color: #5238d4;
+  border-color: #5238d4;
+}
+
 .home-page {
   width: 100%;
   min-height: 100vh;
@@ -305,7 +422,7 @@ import AccordionContent from 'primevue/accordioncontent'
 }
 
 .hero-container {
-  max-width: 1200px;
+  max-width: 1380px;
   margin: 0 auto;
   padding: 80px 24px;
 }
@@ -639,7 +756,7 @@ import AccordionContent from 'primevue/accordioncontent'
 /* FAQ Section */
 .faq-section {
   padding: 80px 24px;
-  background-color: #f8f9fa;
+  background-color: white;
 }
 
 .faq-section .section-title {
@@ -659,11 +776,15 @@ import AccordionContent from 'primevue/accordioncontent'
 
 /* CTA Section */
 .cta-section {
+  width: 100%;
+  background-color: #f8f9fa;
   padding: 100px 24px;
-  text-align: center;
+}
+
+.cta-container {
   max-width: 800px;
   margin: 0 auto;
-  background-color: white;
+  text-align: center;
 }
 
 .cta-title {
@@ -721,6 +842,24 @@ import AccordionContent from 'primevue/accordioncontent'
     gap: 30px;
   }
 
+  .nav-container {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .nav-actions {
+    order: 2;
+    margin-left: auto;
+  }
+
   .section-title {
     font-size: 32px;
   }
@@ -737,6 +876,27 @@ import AccordionContent from 'primevue/accordioncontent'
 
   .hero-description {
     font-size: 18px;
+  }
+
+  .nav-container {
+    padding: 14px 20px;
+    gap: 12px;
+  }
+
+  .nav-links {
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  .nav-actions {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .nav-actions .nav-button {
+    width: 100%;
   }
 
   .steps-container,
@@ -854,5 +1014,11 @@ import AccordionContent from 'primevue/accordioncontent'
   .cta-description {
     font-size: 18px;
   }
+}
+</style>
+
+<style>
+html {
+  scroll-behavior: smooth;
 }
 </style>
