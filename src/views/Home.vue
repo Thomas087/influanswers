@@ -80,7 +80,7 @@
       <div class="pricing-container">
         <h2 class="section-title">Simple, transparent pricing</h2>
         <div class="pricing-content">
-          <div class="pricing-card">
+          <div class="pricing-left">
             <div class="pricing-amount">$25</div>
             <div class="pricing-description">/ question asked to an influencer</div>
             <div class="pricing-features">
@@ -105,6 +105,8 @@
                 <span class="feature-text">PDF report</span>
               </div>
             </div>
+          </div>
+          <div class="pricing-right">
             <div class="pricing-examples">
               <h3 class="examples-title">Examples</h3>
               <div class="example-item">
@@ -113,7 +115,7 @@
               </div>
               <div class="example-item">
                 <div class="example-details">5 questions to 50 influencers</div>
-                <div class="example-price">$5,250</div>
+                <div class="example-price">$6,250</div>
               </div>
             </div>
           </div>
@@ -123,7 +125,7 @@
 
     <!-- FAQ Section -->
     <section class="faq-section">
-      <h2 class="section-title">❓ Frequently Asked Questions</h2>
+      <h2 class="section-title">Frequently Asked Questions</h2>
       <div class="faq-list">
         <div class="card">
           <Accordion value="0">
@@ -444,15 +446,26 @@ import AccordionContent from 'primevue/accordioncontent'
 }
 
 .pricing-content {
-  max-width: 600px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
-.pricing-card {
+.pricing-left {
   background: white;
   padding: 40px 32px;
   border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   text-align: center;
+}
+
+.pricing-right {
+  background: white;
+  padding: 40px 32px;
+  border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -478,6 +491,7 @@ import AccordionContent from 'primevue/accordioncontent'
   display: flex;
   flex-direction: column;
   gap: 12px;
+  text-align: left;
 }
 
 .pricing-feature {
@@ -507,9 +521,8 @@ import AccordionContent from 'primevue/accordioncontent'
 }
 
 .pricing-examples {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid #e9ecef;
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .examples-title {
@@ -681,7 +694,13 @@ import AccordionContent from 'primevue/accordioncontent'
     font-size: 18px;
   }
 
-  .pricing-card {
+  .pricing-content {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .pricing-left,
+  .pricing-right {
     padding: 32px 20px;
   }
 
