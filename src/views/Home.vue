@@ -16,6 +16,17 @@
           <a class="nav-button nav-button--ghost" href="/login">Login</a>
           <a class="nav-button nav-button--primary" href="/brief">Write your brief</a>
         </div>
+        <Button
+          class="mobile-menu-button"
+          severity="secondary"
+          outlined
+          rounded
+          aria-label="Toggle navigation menu"
+          @click="toggleMenu"
+        >
+          <span class="hamburger-icon" aria-hidden="true"></span>
+        </Button>
+        <Menu ref="menu" :model="menuItems" popup class="mobile-nav-menu" />
       </div>
     </header>
     <!-- Hero Section -->
@@ -306,10 +317,53 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+
 import Accordion from 'primevue/accordion'
 import AccordionPanel from 'primevue/accordionpanel'
 import AccordionHeader from 'primevue/accordionheader'
 import AccordionContent from 'primevue/accordioncontent'
+import Menu from 'primevue/menu'
+import Button from 'primevue/button'
+import type { MenuItem } from 'primevue/menuitem'
+
+const menu = ref()
+
+const hideMenu = () => {
+  menu.value?.hide()
+}
+
+const scrollToSection = (sectionId: string) => {
+  const target = document.getElementById(sectionId)
+
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  } else {
+    window.location.hash = sectionId
+  }
+
+  hideMenu()
+}
+
+const navigateTo = (path: string) => {
+  hideMenu()
+  window.location.href = path
+}
+
+const menuItems = ref<MenuItem[]>([
+  { label: 'Home', command: () => scrollToSection('hero') },
+  { label: 'How it works', command: () => scrollToSection('steps') },
+  { label: 'Our clients', command: () => scrollToSection('clients') },
+  { label: 'Pricing', command: () => scrollToSection('pricing') },
+  { label: 'FAQ', command: () => scrollToSection('faq') },
+  { separator: true },
+  { label: 'Login', command: () => navigateTo('/login') },
+  { label: 'Write your brief', command: () => navigateTo('/brief') },
+])
+
+const toggleMenu = (event: MouseEvent) => {
+  menu.value?.toggle(event)
+}
 </script>
 
 <style scoped>
@@ -373,6 +427,43 @@ import AccordionContent from 'primevue/accordioncontent'
   gap: 12px;
 }
 
+.mobile-menu-button {
+  display: none;
+  margin-left: auto;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-menu-button .hamburger-icon {
+  position: relative;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background-color: currentColor;
+}
+
+.mobile-menu-button .hamburger-icon::before,
+.mobile-menu-button .hamburger-icon::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background-color: currentColor;
+}
+
+.mobile-menu-button .hamburger-icon::before {
+  top: -6px;
+}
+
+.mobile-menu-button .hamburger-icon::after {
+  top: 6px;
+}
+
 .nav-button {
   display: inline-flex;
   align-items: center;
@@ -424,7 +515,7 @@ import AccordionContent from 'primevue/accordioncontent'
 .hero-container {
   max-width: 1380px;
   margin: 0 auto;
-  padding: 80px 24px;
+  padding: 110px 24px;
 }
 
 .hero-content {
@@ -466,6 +557,13 @@ import AccordionContent from 'primevue/accordioncontent'
   height: auto;
   display: block;
   object-fit: cover;
+}
+
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .hero-container {
+    padding-left: 96px;
+    padding-right: 96px;
+  }
 }
 
 /* Steps Section */
@@ -843,21 +941,17 @@ import AccordionContent from 'primevue/accordioncontent'
   }
 
   .nav-container {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 16px;
   }
 
-  .nav-links {
-    order: 3;
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-
+  .nav-links,
   .nav-actions {
-    order: 2;
-    margin-left: auto;
+    display: none;
+  }
+
+  .mobile-menu-button {
+    display: inline-flex;
   }
 
   .section-title {
@@ -883,20 +977,9 @@ import AccordionContent from 'primevue/accordioncontent'
     gap: 12px;
   }
 
-  .nav-links {
-    justify-content: flex-start;
-    gap: 12px;
-  }
-
-  .nav-actions {
-    width: 100%;
-    justify-content: flex-start;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .nav-actions .nav-button {
-    width: 100%;
+  .mobile-menu-button {
+    width: 40px;
+    height: 40px;
   }
 
   .steps-container,
