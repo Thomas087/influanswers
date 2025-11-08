@@ -52,6 +52,33 @@
       </div>
     </section>
 
+    <!-- Our Clients Section -->
+    <section class="clients-section">
+      <div class="clients-container">
+        <h2 class="section-title">Our clients</h2>
+        <div class="clients-grid">
+          <div class="client-logo">
+            <img src="/client-logos/armani.png" alt="Armani" />
+          </div>
+          <div class="client-logo">
+            <img src="/client-logos/dior.png" alt="Dior" />
+          </div>
+          <div class="client-logo">
+            <img src="/client-logos/google.png" alt="Google" />
+          </div>
+          <div class="client-logo">
+            <img src="/client-logos/louis-vuitton.png" alt="Louis Vuitton" />
+          </div>
+          <div class="client-logo">
+            <img src="/client-logos/maison-kitsune.svg" alt="Maison Kitsuné" />
+          </div>
+          <div class="client-logo">
+            <img src="/client-logos/polene.png" alt="Polène" />
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Why Brands Love Section -->
     <section class="benefits-section">
       <div class="benefits-container">
@@ -390,7 +417,7 @@ import AccordionContent from 'primevue/accordioncontent'
 /* Benefits Section */
 .benefits-section {
   width: 100%;
-  background-color: #f8f9fa;
+  background-color: white;
 }
 
 .benefits-container {
@@ -433,10 +460,62 @@ import AccordionContent from 'primevue/accordioncontent'
   margin: 0;
 }
 
+/* Our Clients Section */
+.clients-section {
+  width: 100%;
+  background-color: #f8f9fa;
+}
+
+.clients-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 24px;
+}
+
+.clients-container .section-title {
+  margin-bottom: 40px;
+}
+
+.clients-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 40px;
+  align-items: center;
+  justify-items: center;
+}
+
+.client-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 80px;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.client-logo:hover {
+  opacity: 1;
+}
+
+.client-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: grayscale(100%);
+  transition: filter 0.3s ease;
+}
+
+.client-logo:hover img {
+  filter: grayscale(0%);
+}
+
 /* Pricing Section */
 .pricing-section {
   width: 100%;
-  background-color: white;
+  background-color: #f8f9fa;
 }
 
 .pricing-container {
@@ -637,6 +716,11 @@ import AccordionContent from 'primevue/accordioncontent'
     grid-template-columns: 1fr;
   }
 
+  .clients-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+
   .section-title {
     font-size: 32px;
   }
@@ -660,12 +744,26 @@ import AccordionContent from 'primevue/accordioncontent'
     padding: 40px 20px;
   }
 
-  .benefits-container .section-title {
+  .benefits-container .section-title,
+  .clients-container .section-title {
     margin-bottom: 30px;
   }
 
   .benefits-grid {
     gap: 24px;
+  }
+
+  .clients-container {
+    padding: 40px 20px;
+  }
+
+  .clients-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .client-logo {
+    height: 60px;
   }
 
   .benefit-card {
