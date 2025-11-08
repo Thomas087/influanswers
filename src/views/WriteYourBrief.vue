@@ -109,9 +109,7 @@ const selection = reactive<InfluencerSelection>({
   additionalNotes: '',
 })
 
-const isBriefValid = computed(
-  () => brief.projectName.trim() && brief.brandSummary.trim() && brief.keyObjectives.trim(),
-)
+const isBriefValid = computed(() => brief.brandSummary.trim().length > 0)
 
 const isQuestionsValid = computed(() => brief.questions.trim().length > 0)
 

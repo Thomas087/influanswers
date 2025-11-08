@@ -1,75 +1,28 @@
 <template>
   <section class="write-brief-step">
     <div class="step-description">
-      <h2 class="step-title">Project details</h2>
-      <p class="step-subtitle">
-        Tell us what you want to learn so we can match you with the right community and craft the
-        perfect questionnaire.
-      </p>
+      <h2 class="step-question-intro">Describe your project in as many details as possible:</h2>
+      <ul class="step-question-list">
+        <li>What is your brand?</li>
+        <li>What does it do?</li>
+        <li>What kind of influencers do you want to interview?</li>
+        <li>What kind of questions do you want to ask?</li>
+      </ul>
     </div>
-    <div class="form-grid">
-      <div class="form-field">
-        <label class="field-label" for="project-name">Project name</label>
-        <InputText
-          id="project-name"
-          :modelValue="modelValue.projectName"
-          @update:modelValue="updateField('projectName', $event)"
-          placeholder="e.g. Summer collection feedback"
-        />
-      </div>
-
-      <div class="form-field form-field--full">
-        <label class="field-label" for="brand-summary">Brief summary</label>
-        <Textarea
-          id="brand-summary"
-          :modelValue="modelValue.brandSummary"
-          @update:modelValue="updateField('brandSummary', $event)"
-          rows="4"
-          auto-resize
-          placeholder="Describe your brand and the context for this research."
-        />
-      </div>
-
-      <div class="form-field form-field--full">
-        <label class="field-label" for="key-objectives">Key objectives</label>
-        <Textarea
-          id="key-objectives"
-          :modelValue="modelValue.keyObjectives"
-          @update:modelValue="updateField('keyObjectives', $event)"
-          rows="4"
-          auto-resize
-          placeholder="List the outcomes you expect from this study."
-        />
-      </div>
-
-      <div class="form-field">
-        <label class="field-label" for="budget-range">Budget range</label>
-        <Dropdown
-          id="budget-range"
-          :modelValue="modelValue.budgetRange"
-          :options="budgetOptions"
-          placeholder="Select a range"
-          @update:modelValue="updateField('budgetRange', $event)"
-        />
-      </div>
-
-      <div class="form-field">
-        <label class="field-label" for="timeline">Timeline</label>
-        <Dropdown
-          id="timeline"
-          :modelValue="modelValue.timeline"
-          :options="timelineOptions"
-          placeholder="When do you need answers?"
-          @update:modelValue="updateField('timeline', $event)"
-        />
-      </div>
+    <div class="form-field">
+      <Textarea
+        id="project-description"
+        :modelValue="modelValue.brandSummary"
+        @update:modelValue="updateField('brandSummary', $event)"
+        rows="12"
+        auto-resize
+        placeholder="Enter your project details here..."
+      />
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import Dropdown from 'primevue/dropdown'
-import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 
 import type { BriefDetails } from '@/types/brief'
@@ -81,16 +34,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: BriefDetails]
 }>()
-
-const budgetOptions = [
-  'Under $5,000',
-  '$5,000 – $10,000',
-  '$10,000 – $25,000',
-  '$25,000 – $50,000',
-  'Above $50,000',
-]
-
-const timelineOptions = ['Within 1 week', '2 weeks', '3-4 weeks', '1-2 months', 'Flexible']
 
 const updateField = <K extends keyof BriefDetails>(
   field: K,
@@ -109,46 +52,66 @@ const updateField = <K extends keyof BriefDetails>(
 .write-brief-step {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 16px;
 }
 
 .step-description {
-  max-width: 720px;
+  max-width: 100%;
+  margin-bottom: 0;
 }
 
-.step-title {
-  margin: 0 0 8px;
-  font-size: 24px;
-  font-weight: 600;
-  color: #1a1a1a;
-}
-
-.step-subtitle {
-  margin: 0;
+.step-question-intro {
+  margin: 0 0 6px;
   font-size: 16px;
-  color: #4a5568;
-  line-height: 1.5;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
 }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 24px;
+.step-question-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.step-question-list li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #334155;
+  line-height: 1.3;
+}
+
+.step-question-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  font-size: 18px;
+  color: #6348ed;
+  font-weight: 600;
+  line-height: 1;
 }
 
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  width: 100%;
 }
 
-.form-field--full {
-  grid-column: 1 / -1;
+.form-field :deep(.p-textarea) {
+  width: 100%;
+  min-height: 300px;
 }
 
-.field-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #2d3748;
+.form-field :deep(.p-inputtextarea) {
+  width: 100%;
+  font-size: 16px;
+  line-height: 1.6;
+  padding: 16px;
 }
 </style>
