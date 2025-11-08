@@ -33,7 +33,11 @@
 
           <StepPanels>
             <StepPanel v-for="step in steps" :key="step.value" :value="step.value">
-              <WriteBriefStep v-if="step.value === 1" v-model="brief" />
+              <WriteBriefStep
+                v-if="step.value === 1"
+                :model-value="brief"
+                @update:model-value="(value) => Object.assign(brief, value)"
+              />
               <QuestionsStep v-else-if="step.value === 2" v-model="brief" />
               <SelectInfluencersStep v-else-if="step.value === 3" v-model="selection" />
               <ConfirmStep v-else-if="step.value === 4" :brief="brief" :selection="selection">
@@ -58,9 +62,15 @@
                   :icon="step.nextIcon"
                   :icon-pos="step.nextIconPos"
                   :severity="step.nextSeverity"
-                  :loading="step.isSubmit && isSubmitting"
-                  :disabled="step.isDisabled?.value || (step.isSubmit && isSubmitting)"
-                  @click="step.isSubmit ? submitBrief() : nextStep()"
+                  :loading="
+                    (step.isSubmit && isSubmitting) || (step.value === 1 && isProcessingChatGPT)
+                  "
+                  :disabled="
+                    (step.isDisabled?.() ?? false) ||
+                    (step.isSubmit && isSubmitting) ||
+                    (step.value === 1 && isProcessingChatGPT)
+                  "
+                  @click="() => (step.isSubmit ? submitBrief() : nextStep())"
                 />
               </div>
             </StepPanel>
@@ -87,9 +97,11 @@ import QuestionsStep from '@/components/brief/QuestionsStep.vue'
 import SelectInfluencersStep from '@/components/brief/SelectInfluencersStep.vue'
 import WriteBriefStep from '@/components/brief/WriteBriefStep.vue'
 import type { BriefDetails, InfluencerSelection } from '@/types/brief'
+import { supabase } from '@/lib/supabase'
 
 const activeStep = ref(1)
 const isSubmitting = ref(false)
+const isProcessingChatGPT = ref(false)
 const toast = useToast()
 
 const brief = reactive<BriefDetails>({
@@ -131,7 +143,7 @@ const steps = computed(() => [
     nextIconPos: 'right',
     nextSeverity: undefined,
     isSubmit: false,
-    isDisabled: computed(() => !isBriefValid.value),
+    isDisabled: () => !isBriefValid.value,
   },
   {
     value: 2,
@@ -142,7 +154,7 @@ const steps = computed(() => [
     nextIconPos: 'right',
     nextSeverity: undefined,
     isSubmit: false,
-    isDisabled: computed(() => !isQuestionsValid.value),
+    isDisabled: () => !isQuestionsValid.value,
   },
   {
     value: 3,
@@ -153,7 +165,7 @@ const steps = computed(() => [
     nextIconPos: 'right',
     nextSeverity: undefined,
     isSubmit: false,
-    isDisabled: computed(() => !isSelectionValid.value),
+    isDisabled: () => !isSelectionValid.value,
   },
   {
     value: 4,
@@ -165,12 +177,89 @@ const steps = computed(() => [
     nextIconPos: undefined,
     nextSeverity: 'success',
     isSubmit: true,
-    isDisabled: computed(() => !canSubmit.value),
+    isDisabled: () => !canSubmit.value,
   },
 ])
 
-const nextStep = () => {
-  if (activeStep.value < steps.value.length) activeStep.value++
+const nextStep = async () => {
+  console.log('nextStep called, current step:', activeStep.value)
+
+  // If moving from step 1 to step 2, call ChatGPT API first
+  if (activeStep.value === 1 && brief.brandSummary.trim()) {
+    try {
+      console.log('Calling ChatGPT API...')
+      await handleChatGPTRequest()
+      // Only advance if ChatGPT call succeeds
+      if (activeStep.value < steps.value.length) {
+        console.log('Advancing to step:', activeStep.value + 1)
+        activeStep.value++
+      }
+    } catch (error) {
+      console.error('Error in nextStep:', error)
+      // Don't advance if ChatGPT call fails - error is already shown in handleChatGPTRequest
+      return
+    }
+  } else {
+    // For other steps, advance normally
+    if (activeStep.value < steps.value.length) {
+      console.log('Advancing to step:', activeStep.value + 1)
+      activeStep.value++
+    }
+  }
+}
+
+const handleChatGPTRequest = async () => {
+  if (isProcessingChatGPT.value) {
+    throw new Error('ChatGPT request already in progress')
+  }
+
+  isProcessingChatGPT.value = true
+
+  try {
+    // Call the Supabase Edge Function
+    const { data, error } = await supabase.functions.invoke('chatgpt-brief', {
+      body: {
+        brandSummary: brief.brandSummary,
+      },
+    })
+
+    if (error) {
+      throw error
+    }
+
+    if (data?.success && data?.response) {
+      // Show success message with ChatGPT response
+      toast.add({
+        severity: 'success',
+        summary: 'Brief analyzed',
+        detail: 'ChatGPT has analyzed your brief. Check the console for detailed suggestions.',
+        life: 5000,
+      })
+
+      // Log the full response for now (you can enhance this to display it in the UI)
+      console.log('ChatGPT Analysis:', data.response)
+
+      // Optionally, you could pre-fill some fields based on the response
+      // For example, extract key objectives or questions suggestions
+    } else {
+      throw new Error(data?.error || 'Failed to get response from ChatGPT')
+    }
+  } catch (error) {
+    console.error('ChatGPT API error:', error)
+    toast.add({
+      severity: 'error',
+      summary: 'Analysis failed',
+      detail:
+        error instanceof Error
+          ? error.message
+          : 'Could not analyze brief with ChatGPT. Please try again.',
+      life: 5000,
+    })
+    // Re-throw the error so nextStep knows it failed
+    throw error
+  } finally {
+    isProcessingChatGPT.value = false
+  }
 }
 
 const prevStep = () => {
