@@ -2,7 +2,7 @@
   <div class="brief-page">
     <Toast />
     <div class="page-shell">
-      <header class="page-header">
+      <header>
         <div class="header-content">
           <p class="page-eyebrow">Influencer research brief</p>
           <h1 class="page-title">Write your brief</h1>
@@ -26,54 +26,27 @@
       <section class="stepper-section">
         <Stepper v-model:value="activeStep" linear>
           <StepList>
-            <Step :value="steps[0]">
-              <div
-                class="stepper-header"
-                :class="getStepStatus(steps[0])"
-                :aria-current="activeStep === steps[0] ? 'step' : undefined"
-              >
-                <span class="step-index">{{ getStepIndex(steps[0]) }}</span>
-                <span class="step-label">Write your brief</span>
-              </div>
-            </Step>
-            <Step :value="steps[1]">
-              <div
-                class="stepper-header"
-                :class="getStepStatus(steps[1])"
-                :aria-current="activeStep === steps[1] ? 'step' : undefined"
-              >
-                <span class="step-index">{{ getStepIndex(steps[1]) }}</span>
-                <span class="step-label">Select your influencers</span>
-              </div>
-            </Step>
-            <Step :value="steps[2]">
-              <div
-                class="stepper-header"
-                :class="getStepStatus(steps[2])"
-                :aria-current="activeStep === steps[2] ? 'step' : undefined"
-              >
-                <span class="step-index">{{ getStepIndex(steps[2]) }}</span>
-                <span class="step-label">Confirm</span>
-              </div>
-            </Step>
+            <Step :value="1">Write your brief</Step>
+            <Step :value="2">Select your influencers</Step>
+            <Step :value="3">Confirm</Step>
           </StepList>
 
           <StepPanels>
-            <StepPanel :value="steps[0]" v-slot="{ activateCallback }">
+            <StepPanel :value="1">
               <WriteBriefStep v-model="brief" />
               <div class="step-footer">
-                <div class="step-footer__spacer" />
+                <div></div>
                 <Button
                   label="Continue"
                   icon="pi pi-arrow-right"
                   icon-pos="right"
                   :disabled="!isBriefValid"
-                  @click="activateCallback(steps[1])"
+                  @click="activeStep = 2"
                 />
               </div>
             </StepPanel>
 
-            <StepPanel :value="steps[1]" v-slot="{ activateCallback }">
+            <StepPanel :value="2">
               <SelectInfluencersStep v-model="selection" />
               <div class="step-footer">
                 <Button
@@ -81,19 +54,19 @@
                   icon="pi pi-arrow-left"
                   severity="secondary"
                   outlined
-                  @click="activateCallback(steps[0])"
+                  @click="activeStep = 1"
                 />
                 <Button
                   label="Continue"
                   icon="pi pi-arrow-right"
                   icon-pos="right"
                   :disabled="!isSelectionValid"
-                  @click="activateCallback(steps[2])"
+                  @click="activeStep = 3"
                 />
               </div>
             </StepPanel>
 
-            <StepPanel :value="steps[2]" v-slot="{ activateCallback }">
+            <StepPanel :value="3">
               <ConfirmStep :brief="brief" :selection="selection">
                 <template #actions>
                   <div class="logistics-actions">
@@ -110,7 +83,7 @@
                   icon="pi pi-arrow-left"
                   severity="secondary"
                   outlined
-                  @click="activateCallback(steps[1])"
+                  @click="activeStep = 2"
                 />
                 <Button
                   label="Submit brief"
@@ -145,10 +118,9 @@ import SelectInfluencersStep from '@/components/brief/SelectInfluencersStep.vue'
 import WriteBriefStep from '@/components/brief/WriteBriefStep.vue'
 import type { BriefDetails, InfluencerSelection } from '@/types/brief'
 
-const steps = ['brief', 'influencers', 'confirm'] as const
-type StepValue = (typeof steps)[number]
-
-const activeStep = ref<StepValue>('brief')
+const activeStep = ref(1)
+const isSubmitting = ref(false)
+const toast = useToast()
 
 const brief = reactive<BriefDetails>({
   projectName: '',
@@ -168,10 +140,7 @@ const selection = reactive<InfluencerSelection>({
 })
 
 const isBriefValid = computed(
-  () =>
-    brief.projectName.trim().length > 0 &&
-    brief.brandSummary.trim().length > 0 &&
-    brief.keyObjectives.trim().length > 0,
+  () => brief.projectName.trim() && brief.brandSummary.trim() && brief.keyObjectives.trim(),
 )
 
 const isSelectionValid = computed(
@@ -180,27 +149,12 @@ const isSelectionValid = computed(
 
 const canSubmit = computed(() => isBriefValid.value && isSelectionValid.value)
 
-const getStepStatus = (value: StepValue) => {
-  const currentIndex = steps.indexOf(activeStep.value)
-  const targetIndex = steps.indexOf(value)
-
-  if (targetIndex < currentIndex) return 'is-completed'
-  if (targetIndex === currentIndex) return 'is-active'
-  return 'is-upcoming'
-}
-
-const getStepIndex = (value: StepValue) => steps.indexOf(value) + 1
-
-const toast = useToast()
-const isSubmitting = ref(false)
-
 const submitBrief = async () => {
   if (!canSubmit.value || isSubmitting.value) return
 
   isSubmitting.value = true
 
   try {
-    // Simulate a call to the backend. Replace with real API integration.
     await new Promise((resolve) => setTimeout(resolve, 800))
 
     toast.add({
@@ -210,7 +164,22 @@ const submitBrief = async () => {
       life: 5000,
     })
 
-    activeStep.value = 'brief'
+    Object.assign(brief, {
+      projectName: '',
+      brandSummary: '',
+      keyObjectives: '',
+      questions: '',
+      budgetRange: '',
+      timeline: '',
+    })
+    Object.assign(selection, {
+      platforms: [],
+      categories: [],
+      regions: [],
+      audienceSize: '',
+      additionalNotes: '',
+    })
+    activeStep.value = 1
   } catch (error) {
     console.error(error)
     toast.add({
@@ -240,30 +209,27 @@ const submitBrief = async () => {
   gap: 48px;
 }
 
-.page-header {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: 32px;
-  align-items: start;
-}
-
 .header-content {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.page-eyebrow {
+.page-eyebrow,
+.page-title,
+.page-subtitle {
   margin: 0;
+}
+
+.page-eyebrow {
   font-size: 13px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #6366f1;
+  color: #6348ed;
   font-weight: 600;
 }
 
 .page-title {
-  margin: 0;
   font-size: 42px;
   line-height: 1.15;
   font-weight: 700;
@@ -271,40 +237,9 @@ const submitBrief = async () => {
 }
 
 .page-subtitle {
-  margin: 0;
   font-size: 18px;
   line-height: 1.6;
   color: #475569;
-}
-
-.header-aside {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.support-card {
-  border-radius: 16px;
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  background: #ffffff;
-  padding: 24px;
-  box-shadow: 0 15px 40px rgba(79, 70, 229, 0.12);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.support-card h2 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #312e81;
-}
-
-.support-card p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #4338ca;
 }
 
 .stepper-section {
@@ -314,93 +249,24 @@ const submitBrief = async () => {
   box-shadow: 0 30px 60px rgba(15, 23, 42, 0.08);
 }
 
-.stepper-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 18px;
-  border-radius: 999px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
-  color: #64748b;
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.stepper-header:hover {
-  background: rgba(99, 102, 241, 0.1);
-}
-
-.stepper-header.is-active {
-  background: rgba(99, 102, 241, 0.12);
-  color: #312e81;
-}
-
-.stepper-header.is-completed {
-  color: #2563eb;
-}
-
-.stepper-header.is-completed .step-index {
-  background: #2563eb;
-  color: #ffffff;
-}
-
-.step-index {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(148, 163, 184, 0.2);
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.stepper-header.is-active .step-index {
-  background: #6366f1;
-  color: #ffffff;
-}
-
-.step-label {
-  white-space: nowrap;
-}
-
 .step-footer {
   margin-top: 32px;
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  flex-wrap: wrap;
-}
-
-.step-footer__spacer {
-  flex: 1 1 160px;
 }
 
 .logistics-actions {
   margin-top: 24px;
   padding: 16px;
   border-radius: 12px;
-  background: rgba(79, 70, 229, 0.08);
-  color: #312e81;
+  background: rgba(99, 72, 237, 0.08);
+  color: #5238d4;
   font-size: 14px;
   line-height: 1.5;
 }
 
 @media (max-width: 1024px) {
-  .page-header {
-    grid-template-columns: 1fr;
-  }
-
-  .header-aside {
-    justify-content: flex-start;
-  }
-
   .stepper-section {
     padding: 32px 24px;
   }
@@ -419,21 +285,8 @@ const submitBrief = async () => {
     padding: 24px 16px;
   }
 
-  .stepper-header {
-    width: 100%;
-  }
-
-  .step-label {
-    white-space: normal;
-  }
-
   .step-footer {
     flex-direction: column;
-    align-items: stretch;
-  }
-
-  .step-footer__spacer {
-    display: none;
   }
 }
 </style>

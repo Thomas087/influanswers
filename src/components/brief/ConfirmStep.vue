@@ -173,8 +173,8 @@ defineProps<{
 }
 
 .summary-card--highlight {
-  border-color: #c3dafe;
-  background: #f8fbff;
+  border-color: rgba(99, 72, 237, 0.3);
+  background: rgba(99, 72, 237, 0.04);
 }
 
 .summary-header h3 {

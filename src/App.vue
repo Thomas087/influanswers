@@ -7,6 +7,12 @@ import { RouterView } from 'vue-router'
 </template>
 
 <style>
+:root {
+  --primary-color: #6348ed;
+  --primary-color-dark: #5238d4;
+  --primary-color-darker: #4530b8;
+}
+
 * {
   margin: 0;
   padding: 0;
