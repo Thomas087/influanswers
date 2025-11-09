@@ -19,6 +19,9 @@
           class="influencer-count-input"
         />
         <Slider v-model="numberOfInfluencersValue" :min="10" :max="500" class="w-24" />
+        <Message v-if="isInfluencerCountInvalid" severity="error" size="small" variant="simple">
+          {{ influencerCountErrorMessage }}
+        </Message>
       </div>
     </div>
 
@@ -107,6 +110,7 @@ import { ref, computed, watch } from 'vue'
 import AutoComplete from 'primevue/autocomplete'
 import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
+import Message from 'primevue/message'
 import MultiSelect from 'primevue/multiselect'
 import Slider from 'primevue/slider'
 import Textarea from 'primevue/textarea'
@@ -147,6 +151,45 @@ const audienceSizeOptions = [
 const suggestions = ref<string[]>([])
 
 const numberOfInfluencersValue = ref(props.modelValue.numberOfInfluencers || 10)
+
+// Validation for influencer count
+const isInfluencerCountInvalid = computed(() => {
+  const value = numberOfInfluencersValue.value
+  return value < 10 || value > 500 || isNaN(value)
+})
+
+const influencerCountErrorMessage = computed(() => {
+  const value = numberOfInfluencersValue.value
+  if (isNaN(value)) {
+    return 'Please enter a valid number'
+  }
+  if (value < 10) {
+    return 'Number of influencers must be at least 10'
+  }
+  if (value > 500) {
+    return 'Number of influencers must be at most 500'
+  }
+  return ''
+})
+
+// Sync ref with prop changes (from parent)
+watch(
+  () => props.modelValue.numberOfInfluencers,
+  (newValue) => {
+    const clampedValue = Math.max(10, Math.min(500, newValue || 10))
+    if (clampedValue !== numberOfInfluencersValue.value) {
+      numberOfInfluencersValue.value = clampedValue
+    }
+  },
+)
+
+// Watch ref changes and update parent (from user input)
+watch(numberOfInfluencersValue, (newValue) => {
+  // Only update if value is valid
+  if (!isNaN(newValue) && newValue >= 10 && newValue <= 500) {
+    updateField('numberOfInfluencers', newValue)
+  }
+})
 
 const previousCollaborationsValue = computed({
   get: () => props.modelValue.previousCollaborations || [],
