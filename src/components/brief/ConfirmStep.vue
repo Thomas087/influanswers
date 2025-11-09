@@ -21,7 +21,7 @@
             </div>
             <div>
               <dt>Summary</dt>
-              <dd>{{ brief.brandSummary || '—' }}</dd>
+              <dd>{{ brief.brandBrief || '—' }}</dd>
             </div>
             <div>
               <dt>Objectives</dt>
@@ -29,7 +29,16 @@
             </div>
             <div>
               <dt>Key questions</dt>
-              <dd>{{ brief.questions || '—' }}</dd>
+              <dd>
+                <template v-if="brief.questions && brief.questions.length > 0">
+                  <ul class="questions-list">
+                    <li v-for="(question, index) in brief.questions" :key="index">
+                      {{ question }}
+                    </li>
+                  </ul>
+                </template>
+                <span v-else>—</span>
+              </dd>
             </div>
           </dl>
         </div>
@@ -207,6 +216,28 @@ defineProps<{
 
 .summary-tag {
   margin: 0 8px 8px 0;
+}
+
+.questions-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.questions-list li {
+  position: relative;
+  padding-left: 20px;
+}
+
+.questions-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #6348ed;
+  font-weight: 600;
 }
 </style>
 

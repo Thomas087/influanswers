@@ -1,8 +1,8 @@
 export interface BriefDetails {
   projectName: string
-  brandSummary: string
+  brandBrief: string
   keyObjectives: string
-  questions: string
+  questions: string[]
   budgetRange: string
   timeline: string
 }

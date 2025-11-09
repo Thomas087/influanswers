@@ -4,6 +4,7 @@ import Aura from '@primeuix/themes/aura'
 import { definePreset } from '@primeuix/themes'
 import ToastService from 'primevue/toastservice'
 import { createPinia } from 'pinia'
+import 'primeicons/primeicons.css'
 
 import App from './App.vue'
 import router from './router'

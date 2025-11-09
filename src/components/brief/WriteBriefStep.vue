@@ -12,8 +12,8 @@
     <div class="form-field">
       <Textarea
         id="project-description"
-        :modelValue="modelValue.brandSummary"
-        @update:modelValue="updateField('brandSummary', $event)"
+        :modelValue="modelValue.brandBrief"
+        @update:modelValue="updateField('brandBrief', $event)"
         rows="12"
         auto-resize
         placeholder="Enter your project details here..."

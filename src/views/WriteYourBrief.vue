@@ -106,9 +106,9 @@ const toast = useToast()
 
 const brief = reactive<BriefDetails>({
   projectName: '',
-  brandSummary: '',
+  brandBrief: '',
   keyObjectives: '',
-  questions: '',
+  questions: [],
   budgetRange: '',
   timeline: '',
 })
@@ -121,9 +121,12 @@ const selection = reactive<InfluencerSelection>({
   additionalNotes: '',
 })
 
-const isBriefValid = computed(() => brief.brandSummary.trim().length > 0)
+const isBriefValid = computed(() => brief.brandBrief.trim().length > 0)
 
-const isQuestionsValid = computed(() => brief.questions.trim().length > 0)
+const isQuestionsValid = computed(() => {
+  const validQuestions = brief.questions.filter((q) => q.trim().length > 0)
+  return validQuestions.length >= 3
+})
 
 const isSelectionValid = computed(
   () => selection.platforms.length > 0 || selection.categories.length > 0,
@@ -185,7 +188,7 @@ const nextStep = async () => {
   console.log('nextStep called, current step:', activeStep.value)
 
   // If moving from step 1 to step 2, call ChatGPT API first
-  if (activeStep.value === 1 && brief.brandSummary.trim()) {
+  if (activeStep.value === 1 && brief.brandBrief.trim()) {
     try {
       console.log('Calling ChatGPT API...')
       await handleChatGPTRequest()
@@ -219,7 +222,7 @@ const handleChatGPTRequest = async () => {
     // Call the Supabase Edge Function
     const { data, error } = await supabase.functions.invoke('chatgpt-brief', {
       body: {
-        brandSummary: brief.brandSummary,
+        brandSummary: brief.brandBrief,
       },
     })
 
@@ -283,9 +286,9 @@ const submitBrief = async () => {
 
     Object.assign(brief, {
       projectName: '',
-      brandSummary: '',
+      brandBrief: '',
       keyObjectives: '',
-      questions: '',
+      questions: [],
       budgetRange: '',
       timeline: '',
     })

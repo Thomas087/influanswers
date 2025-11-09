@@ -7,13 +7,69 @@
 
 ## Setup Steps
 
-### 1. Add ChatGPT API Key to Database
+### 1. Add ChatGPT API Key (Recommended: Edge Function Secrets)
 
-To enable ChatGPT functionality, you need to add your OpenAI API key to the Supabase database.
+**⚠️ Security Best Practice**: API keys should NOT be stored in plain database tables. Use one of the secure methods below.
 
-You can do this in one of the following ways:
+#### Option A: Edge Function Secrets (Recommended for Edge Functions)
 
-#### Option A: Using Supabase Dashboard
+This is the **recommended approach** for Edge Functions. Secrets are stored securely and accessed via environment variables.
+
+**Using the Dashboard:**
+1. Go to https://supabase.com/dashboard/project/vichgewghqwxvmuxlmfn
+2. Navigate to **Settings** → **Edge Functions** → **Secrets**
+3. Add a new secret:
+   - **Key**: `OPENAI_API_KEY`
+   - **Value**: Your OpenAI API key
+4. Click **Save**
+
+**Using the CLI:**
+```bash
+supabase secrets set OPENAI_API_KEY=your-openai-api-key-here
+```
+
+The Edge Function can then access it via:
+```typescript
+const apiKey = Deno.env.get('OPENAI_API_KEY')
+```
+
+#### Option B: Supabase Vault (For Database-Accessible Secrets)
+
+If you need to access the secret from SQL (Postgres functions, triggers, webhooks), use Vault which stores secrets encrypted on disk.
+
+**Using the Dashboard:**
+1. Go to https://supabase.com/dashboard/project/vichgewghqwxvmuxlmfn
+2. Navigate to **Database** → **Vault**
+3. Click **Create Secret**
+4. Enter:
+   - **Name**: `chatgpt_api_key`
+   - **Secret**: Your OpenAI API key
+   - **Description**: OpenAI API key for ChatGPT integration
+5. Click **Save**
+
+**Using SQL:**
+```sql
+SELECT vault.create_secret(
+  'your-openai-api-key-here',
+  'chatgpt_api_key',
+  'OpenAI API key for ChatGPT integration'
+);
+```
+
+Access the secret in SQL:
+```sql
+SELECT decrypted_secret 
+FROM vault.decrypted_secrets 
+WHERE name = 'chatgpt_api_key';
+```
+
+**⚠️ Note**: If using Vault, update your Edge Function to query the `vault.decrypted_secrets` view instead of the `api_keys` table.
+
+#### Option C: Database Table (Not Recommended)
+
+**⚠️ This method is NOT secure** and should only be used for development/testing. For production, use Option A or B above.
+
+If you must use this method temporarily:
 1. Go to https://supabase.com/dashboard/project/vichgewghqwxvmuxlmfn
 2. Navigate to the SQL Editor
 3. Run the following SQL:
@@ -24,11 +80,6 @@ VALUES ('chatgpt_api_key', 'your-openai-api-key-here')
 ON CONFLICT (key_name) 
 DO UPDATE SET key_value = EXCLUDED.key_value, updated_at = NOW();
 ```
-
-Replace `'your-openai-api-key-here'` with your actual OpenAI API key.
-
-#### Option B: Using Supabase MCP (if available)
-You can use the Supabase MCP tools to execute the SQL directly.
 
 ### 2. Environment Variables (Optional)
 
@@ -44,7 +95,10 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 ## How It Works
 
 1. When a user submits the first step (Write Brief), the frontend calls the `chatgpt-brief` Edge Function
-2. The Edge Function retrieves the ChatGPT API key from the `api_keys` table
+2. The Edge Function retrieves the ChatGPT API key from:
+   - **Option A**: Environment variable (`Deno.env.get('OPENAI_API_KEY')`)
+   - **Option B**: Vault (`vault.decrypted_secrets` view via SQL query)
+   - **Option C**: Database table (`api_keys` table - not recommended)
 3. It sends the user's brief content to ChatGPT with a custom prompt
 4. The response is returned to the frontend and logged to the console
 
@@ -55,12 +109,22 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 - **Method**: POST
 - **Body**: `{ "brandSummary": "..." }`
 
-## Database Schema
+## Database Schema (If Using Option C)
 
-The `api_keys` table stores API keys securely:
+**⚠️ Note**: This table should only be used for development/testing. For production, use Edge Function Secrets (Option A) or Vault (Option B).
+
+The `api_keys` table structure (if needed):
 - `id`: UUID (primary key)
 - `key_name`: TEXT (unique, e.g., 'chatgpt_api_key')
-- `key_value`: TEXT (the actual API key)
+- `key_value`: TEXT (the actual API key - stored in plain text)
 - `created_at`: TIMESTAMPTZ
 - `updated_at`: TIMESTAMPTZ
+
+## Security Recommendations
+
+1. **For Edge Functions**: Use **Edge Function Secrets** (Option A) - this is the most secure and recommended approach
+2. **For SQL/Postgres functions**: Use **Supabase Vault** (Option B) - secrets are encrypted at rest
+3. **Never** store API keys in plain database tables in production
+4. **Never** commit API keys to version control
+5. Use different keys for development, staging, and production environments
 
