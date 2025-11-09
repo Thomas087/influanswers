@@ -6,6 +6,7 @@
         <li>What is your brand?</li>
         <li>What does it do?</li>
         <li>What kind of influencers do you want to interview?</li>
+        <li>Which platforms and geographies do you want to target?</li>
         <li>What kind of questions do you want to ask?</li>
       </ul>
     </div>

@@ -38,7 +38,11 @@
                 :model-value="brief"
                 @update:model-value="(value) => Object.assign(brief, value)"
               />
-              <QuestionsStep v-else-if="step.value === 2" v-model="brief" />
+              <QuestionsStep
+                v-else-if="step.value === 2"
+                :model-value="brief"
+                @update:model-value="(value) => Object.assign(brief, value)"
+              />
               <SelectInfluencersStep v-else-if="step.value === 3" v-model="selection" />
               <ConfirmStep v-else-if="step.value === 4" :brief="brief" :selection="selection">
                 <template #actions>

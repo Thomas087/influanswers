@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, nextTick } from 'vue'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
 
@@ -63,6 +63,7 @@ const questionsList = ref<string[]>(
 )
 
 const showValidationError = ref(false)
+const isUpdatingFromParent = ref(false)
 
 // Initialize validation error state
 onMounted(() => {
@@ -70,12 +71,22 @@ onMounted(() => {
   showValidationError.value = validQuestions.length < 3
 })
 
-// Watch for external changes to modelValue
+// Watch for external changes to modelValue (only sync if different)
 watch(
   () => props.modelValue.questions,
   (newQuestions) => {
-    if (newQuestions && newQuestions.length > 0) {
-      questionsList.value = [...newQuestions]
+    if (isUpdatingFromParent.value) return
+
+    const currentValid = questionsList.value.filter((q) => q.trim().length > 0)
+    const newValid = newQuestions ? newQuestions.filter((q) => q.trim().length > 0) : []
+
+    // Only update if the valid questions are actually different
+    if (JSON.stringify(currentValid) !== JSON.stringify(newValid)) {
+      if (newQuestions && newQuestions.length > 0) {
+        questionsList.value = [...newQuestions]
+      } else if (questionsList.value.length === 0) {
+        questionsList.value = ['', '', '']
+      }
     }
   },
   { deep: true },
@@ -85,15 +96,28 @@ watch(
 watch(
   questionsList,
   (newList) => {
+    if (isUpdatingFromParent.value) return
+
     const validQuestions = newList.filter((q) => q.trim().length > 0)
-    emit('update:modelValue', {
-      ...props.modelValue,
-      questions: validQuestions,
-    })
+    const currentValid = props.modelValue.questions || []
+
+    // Only emit if the valid questions actually changed
+    if (JSON.stringify(validQuestions) !== JSON.stringify(currentValid)) {
+      isUpdatingFromParent.value = true
+      emit('update:modelValue', {
+        ...props.modelValue,
+        questions: validQuestions,
+      })
+      // Use nextTick to reset the flag after the parent has processed the update
+      nextTick(() => {
+        isUpdatingFromParent.value = false
+      })
+    }
+
     // Show validation error if less than 3 valid questions
     showValidationError.value = validQuestions.length < 3
   },
-  { deep: true },
+  { deep: true, immediate: true },
 )
 
 const updateQuestion = (index: number, value: string) => {
