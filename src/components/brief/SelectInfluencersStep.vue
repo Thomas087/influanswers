@@ -40,7 +40,7 @@
           :options="platformOptions"
           filter
           placeholder="Select platforms"
-          @update:modelValue="briefStore.updateSelectionField('platforms', $event || [])"
+          @update:modelValue="briefStore.updateSelectionField('platforms', $event ?? [])"
         />
       </div>
 
@@ -74,7 +74,7 @@
           :options="countryOptions"
           filter
           placeholder="Select countries"
-          @update:modelValue="briefStore.updateSelectionField('regions', $event || [])"
+          @update:modelValue="briefStore.updateSelectionField('regions', $event ?? [])"
         />
       </div>
 
@@ -85,7 +85,7 @@
           :modelValue="briefStore.selection.audienceSize"
           :options="audienceSizeOptions"
           placeholder="Select an audience tier"
-          @update:modelValue="briefStore.updateSelectionField('audienceSize', $event || '')"
+          @update:modelValue="briefStore.updateSelectionField('audienceSize', $event ?? '')"
         />
       </div>
 
@@ -98,7 +98,7 @@
           :options="genderOptions"
           filter
           placeholder="Select gender"
-          @update:modelValue="briefStore.updateSelectionField('gender', $event || [])"
+          @update:modelValue="briefStore.updateSelectionField('gender', $event ?? [])"
         />
       </div>
 
@@ -111,7 +111,7 @@
           :options="contentFormatOptions"
           filter
           placeholder="Select content format"
-          @update:modelValue="briefStore.updateSelectionField('contentFormat', $event || [])"
+          @update:modelValue="briefStore.updateSelectionField('contentFormat', $event ?? [])"
         />
       </div>
 
@@ -126,8 +126,7 @@
           multiple
           fluid
           :typeahead="false"
-          :suggestions="suggestions"
-          @complete="search"
+          :suggestions="[]"
           placeholder="Type and press Enter to add"
         />
       </div>
@@ -137,7 +136,7 @@
         <Textarea
           id="additional-notes"
           :modelValue="briefStore.selection.additionalNotes"
-          @update:modelValue="briefStore.updateSelectionField('additionalNotes', $event || '')"
+          @update:modelValue="briefStore.updateSelectionField('additionalNotes', $event ?? '')"
           rows="4"
           auto-resize
           placeholder="Share any extra filters or custom influencer lists."
@@ -148,7 +147,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import AutoComplete from 'primevue/autocomplete'
 import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
@@ -480,13 +479,9 @@ const genderOptions = ['Male', 'Female', 'Other']
 
 const contentFormatOptions = ['Video', 'Reels', 'Photos', 'Live streams', 'Blog', 'Podcast']
 
-const suggestions = ref<string[]>([])
-
 const numberOfInfluencersValue = computed({
-  get: () => briefStore.selection.numberOfInfluencers || 10,
-  set: (value: number) => {
-    briefStore.updateSelectionField('numberOfInfluencers', value)
-  },
+  get: () => briefStore.selection.numberOfInfluencers,
+  set: (value: number) => briefStore.updateSelectionField('numberOfInfluencers', value),
 })
 
 // Validation for influencer count
@@ -510,25 +505,14 @@ const influencerCountErrorMessage = computed(() => {
 })
 
 const previousCollaborationsValue = computed({
-  get: () => briefStore.selection.previousCollaborations || [],
-  set: (value: string[]) => {
-    briefStore.updateSelectionField('previousCollaborations', value)
-  },
+  get: () => briefStore.selection.previousCollaborations,
+  set: (value: string[]) => briefStore.updateSelectionField('previousCollaborations', value),
 })
 
 const selectedCategories = computed({
-  get: () => briefStore.selection.categories || [],
-  set: (value: string[]) => {
-    briefStore.updateSelectionField('categories', value)
-  },
+  get: () => briefStore.selection.categories,
+  set: (value: string[]) => briefStore.updateSelectionField('categories', value),
 })
-
-const search = () => {
-  // For autocomplete without typehead, we can provide suggestions based on the query
-  // For now, we'll return an empty array since typehead is disabled
-  // Users can type and press Enter to add items
-  suggestions.value = []
-}
 </script>
 
 <style scoped>

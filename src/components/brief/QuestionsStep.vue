@@ -11,7 +11,7 @@
         <Textarea
           :id="`question-${index}`"
           :modelValue="question"
-          @update:modelValue="updateQuestion(index, $event || '')"
+          @update:modelValue="briefStore.updateQuestion(index, $event || '')"
           placeholder="Enter a question..."
           class="question-input"
           auto-resize
@@ -21,7 +21,7 @@
         <Button
           icon="pi pi-trash"
           rounded
-          @click="removeQuestion(index)"
+          @click="briefStore.removeQuestion(index)"
           :disabled="questionsList.length <= 3"
           class="delete-button"
         />
@@ -32,7 +32,7 @@
       icon="pi pi-plus"
       severity="secondary"
       outlined
-      @click="addQuestion"
+      @click="briefStore.addQuestion"
       class="add-button"
     />
     <p v-if="showValidationError" class="validation-error">
@@ -53,18 +53,6 @@ const briefStore = useBriefStore()
 const questionsList = computed(() => briefStore.getQuestionsList())
 
 const showValidationError = computed(() => !briefStore.isQuestionsValid)
-
-const updateQuestion = (index: number, value: string) => {
-  briefStore.updateQuestion(index, value)
-}
-
-const addQuestion = () => {
-  briefStore.addQuestion()
-}
-
-const removeQuestion = (index: number) => {
-  briefStore.removeQuestion(index)
-}
 </script>
 
 <style scoped>

@@ -30,9 +30,9 @@
             <div>
               <dt>Key questions</dt>
               <dd>
-                <template v-if="briefStore.brief.questions && briefStore.brief.questions.length > 0">
+                <template v-if="briefStore.questions.length > 0">
                   <ul class="questions-list">
-                    <li v-for="(question, index) in briefStore.brief.questions" :key="index">
+                    <li v-for="(question, index) in briefStore.questions" :key="index">
                       {{ question }}
                     </li>
                   </ul>
@@ -105,7 +105,7 @@
             <div>
               <dt>Gender</dt>
               <dd>
-                <template v-if="briefStore.selection.gender && briefStore.selection.gender.length">
+                <template v-if="briefStore.selection.gender.length">
                   <Tag
                     v-for="gender in briefStore.selection.gender"
                     :key="gender"
@@ -120,9 +120,7 @@
             <div>
               <dt>Content format</dt>
               <dd>
-                <template
-                  v-if="briefStore.selection.contentFormat && briefStore.selection.contentFormat.length"
-                >
+                <template v-if="briefStore.selection.contentFormat.length">
                   <Tag
                     v-for="format in briefStore.selection.contentFormat"
                     :key="format"
@@ -137,12 +135,7 @@
             <div>
               <dt>Previous collaborations</dt>
               <dd>
-                <template
-                  v-if="
-                    briefStore.selection.previousCollaborations &&
-                    briefStore.selection.previousCollaborations.length
-                  "
-                >
+                <template v-if="briefStore.selection.previousCollaborations.length">
                   <Tag
                     v-for="collab in briefStore.selection.previousCollaborations"
                     :key="collab"

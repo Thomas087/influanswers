@@ -14,7 +14,7 @@
       <Textarea
         id="project-description"
         :modelValue="briefStore.brief.brandBrief"
-        @update:modelValue="briefStore.updateBriefField('brandBrief', $event || '')"
+        @update:modelValue="briefStore.updateField('brandBrief', $event || '')"
         rows="12"
         auto-resize
         placeholder="Enter your project details here..."
