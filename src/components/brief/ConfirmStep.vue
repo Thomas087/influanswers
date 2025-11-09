@@ -99,6 +99,21 @@
               <dd>{{ selection.audienceSize || '—' }}</dd>
             </div>
             <div>
+              <dt>Previous collaborations</dt>
+              <dd>
+                <template v-if="selection.previousCollaborations && selection.previousCollaborations.length">
+                  <Tag
+                    v-for="collab in selection.previousCollaborations"
+                    :key="collab"
+                    :value="collab"
+                    severity="success"
+                    class="summary-tag"
+                  />
+                </template>
+                <span v-else>—</span>
+              </dd>
+            </div>
+            <div>
               <dt>Notes</dt>
               <dd>{{ selection.additionalNotes || '—' }}</dd>
             </div>

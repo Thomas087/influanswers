@@ -122,6 +122,7 @@ const selection = reactive<InfluencerSelection>({
   categories: [],
   regions: [],
   audienceSize: '',
+  previousCollaborations: [],
   additionalNotes: '',
 })
 
@@ -301,6 +302,7 @@ const submitBrief = async () => {
       categories: [],
       regions: [],
       audienceSize: '',
+      previousCollaborations: [],
       additionalNotes: '',
     })
     activeStep.value = 1

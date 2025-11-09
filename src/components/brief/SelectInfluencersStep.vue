@@ -56,6 +56,23 @@
       </div>
 
       <div class="form-field form-field--full">
+        <label class="field-label" for="previous-collaborations"
+          >Previous collaborations or mentioned products</label
+        >
+        <AutoComplete
+          id="previous-collaborations"
+          v-model="previousCollaborationsValue"
+          inputId="previous-collaborations"
+          multiple
+          fluid
+          :typeahead="false"
+          :suggestions="suggestions"
+          @complete="search"
+          placeholder="Type and press Enter to add"
+        />
+      </div>
+
+      <div class="form-field form-field--full">
         <label class="field-label" for="additional-notes">Additional notes</label>
         <Textarea
           id="additional-notes"
@@ -71,6 +88,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue'
+import AutoComplete from 'primevue/autocomplete'
 import Dropdown from 'primevue/dropdown'
 import MultiSelect from 'primevue/multiselect'
 import Textarea from 'primevue/textarea'
@@ -107,6 +126,22 @@ const audienceSizeOptions = [
   'Macro (500k – 1M)',
   'Mega (1M+)',
 ]
+
+const suggestions = ref<string[]>([])
+
+const previousCollaborationsValue = computed({
+  get: () => props.modelValue.previousCollaborations || [],
+  set: (value: string[]) => {
+    updateField('previousCollaborations', value)
+  },
+})
+
+const search = () => {
+  // For autocomplete without typehead, we can provide suggestions based on the query
+  // For now, we'll return an empty array since typehead is disabled
+  // Users can type and press Enter to add items
+  suggestions.value = []
+}
 
 const updateField = <K extends keyof InfluencerSelection>(
   field: K,
@@ -166,4 +201,3 @@ const updateField = <K extends keyof InfluencerSelection>(
   color: #2d3748;
 }
 </style>
-

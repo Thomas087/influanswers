@@ -12,6 +12,7 @@ export interface InfluencerSelection {
   categories: string[]
   regions: string[]
   audienceSize: string
+  previousCollaborations: string[]
   additionalNotes: string
 }
 
