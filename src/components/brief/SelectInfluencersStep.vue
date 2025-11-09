@@ -47,12 +47,21 @@
         <label class="field-label" for="categories">Categories / Niches</label>
         <MultiSelect
           id="categories"
+          v-model="selectedCategories"
+          :options="groupedCategories"
+          filter
+          optionGroupLabel="label"
+          optionGroupChildren="items"
           display="chip"
-          :modelValue="modelValue.categories"
-          :options="categoryOptions"
           placeholder="Select categories"
-          @update:modelValue="updateField('categories', $event)"
-        />
+          class="w-full"
+        >
+          <template #optiongroup="slotProps">
+            <div class="flex items-center">
+              <div class="font-semibold">{{ slotProps.option.label }}</div>
+            </div>
+          </template>
+        </MultiSelect>
       </div>
 
       <div class="form-field">
@@ -111,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import AutoComplete from 'primevue/autocomplete'
 import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
@@ -132,15 +141,100 @@ const emit = defineEmits<{
 
 const platformOptions = ['Instagram', 'TikTok', 'YouTube', 'LinkedIn', 'Pinterest', 'Twitch']
 
-const categoryOptions = [
-  'Beauty & Cosmetics',
-  'Fashion & Luxury',
-  'Lifestyle',
-  'Gaming',
-  'Travel',
-  'Health & Wellness',
-  'Tech & Gadgets',
-  'Food & Beverage',
+const groupedCategories = [
+  {
+    label: 'Core lifestyle & personal interests',
+    items: [
+      'Beauty & Cosmetics',
+      'Fashion & Luxury',
+      'Lifestyle',
+      'Health & Wellness',
+      'Fitness & Sports',
+      'Nutrition & Diet',
+      'Mental Health',
+      'Parenting & Family',
+      'Relationships & Dating',
+      'Self-Improvement & Motivation',
+    ],
+  },
+  {
+    label: 'Entertainment & culture',
+    items: [
+      'Gaming',
+      'Movies & TV',
+      'Music',
+      'Art & Design',
+      'Photography',
+      'Books & Literature',
+      'Pop Culture',
+      'Celebrities & Influencers',
+    ],
+  },
+  {
+    label: 'Travel & experiences',
+    items: ['Travel', 'Adventure & Outdoors', 'Hospitality & Tourism', 'Sustainable Travel'],
+  },
+  {
+    label: 'Technology & innovation',
+    items: [
+      'Tech & Gadgets',
+      'AI & Innovation',
+      'Science & Education',
+      'Automotive',
+      'Cryptocurrency & Blockchain',
+      'Finance & Investing',
+      'Startups & Entrepreneurship',
+    ],
+  },
+  {
+    label: 'Food & drink',
+    items: [
+      'Food & Beverage',
+      'Cooking & Recipes',
+      'Wine, Beer & Spirits',
+      'Restaurants & Dining',
+      'Vegan & Plant-Based Living',
+    ],
+  },
+  {
+    label: 'Home & lifestyle',
+    items: [
+      'Home Decor & Interior Design',
+      'DIY & Crafts',
+      'Gardening',
+      'Pets & Animals',
+      'Real Estate',
+    ],
+  },
+  {
+    label: 'Social & environmental topics',
+    items: [
+      'Sustainability & Environment',
+      'Charity & Social Causes',
+      'Politics & Activism',
+      'Education & Learning',
+    ],
+  },
+  {
+    label: 'Professional & business',
+    items: [
+      'Career & Productivity',
+      'Marketing & Advertising',
+      'E-Commerce & Retail',
+      'Events & Conferences',
+    ],
+  },
+  {
+    label: 'Other niches',
+    items: [
+      'Luxury Lifestyle',
+      'Weddings & Events',
+      'Spirituality & Mindfulness',
+      "Men's Lifestyle",
+      "Women's Lifestyle",
+      'Youth & Student Life',
+    ],
+  },
 ]
 
 const countryOptions = [
@@ -377,6 +471,13 @@ const previousCollaborationsValue = computed({
   get: () => props.modelValue.previousCollaborations || [],
   set: (value: string[]) => {
     updateField('previousCollaborations', value)
+  },
+})
+
+const selectedCategories = computed({
+  get: () => props.modelValue.categories || [],
+  set: (value: string[]) => {
+    updateField('categories', value)
   },
 })
 
