@@ -89,6 +89,32 @@
         />
       </div>
 
+      <div class="form-field">
+        <label class="field-label" for="gender">Gender</label>
+        <MultiSelect
+          id="gender"
+          display="chip"
+          :modelValue="modelValue.gender"
+          :options="genderOptions"
+          filter
+          placeholder="Select gender"
+          @update:modelValue="updateField('gender', $event)"
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="field-label" for="content-format">Content format</label>
+        <MultiSelect
+          id="content-format"
+          display="chip"
+          :modelValue="modelValue.contentFormat"
+          :options="contentFormatOptions"
+          filter
+          placeholder="Select content format"
+          @update:modelValue="updateField('contentFormat', $event)"
+        />
+      </div>
+
       <div class="form-field form-field--full">
         <label class="field-label" for="previous-collaborations"
           >Previous collaborations or mentioned products</label
@@ -246,6 +272,7 @@ const groupedCategories = [
       "Men's Lifestyle",
       "Women's Lifestyle",
       'Youth & Student Life',
+      'Other',
     ],
   },
 ]
@@ -455,6 +482,10 @@ const audienceSizeOptions = [
   'Macro (500k – 1M)',
   'Mega (1M+)',
 ]
+
+const genderOptions = ['Male', 'Female', 'Other']
+
+const contentFormatOptions = ['Video', 'Reels', 'Photos', 'Live streams', 'Blog', 'Podcast']
 
 const suggestions = ref<string[]>([])
 

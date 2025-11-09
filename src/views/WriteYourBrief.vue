@@ -123,6 +123,8 @@ const selection = reactive<InfluencerSelection>({
   categories: [],
   regions: [],
   audienceSize: '',
+  gender: [],
+  contentFormat: [],
   previousCollaborations: [],
   additionalNotes: '',
 })

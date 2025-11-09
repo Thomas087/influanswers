@@ -103,6 +103,36 @@
               <dd>{{ selection.audienceSize || '—' }}</dd>
             </div>
             <div>
+              <dt>Gender</dt>
+              <dd>
+                <template v-if="selection.gender && selection.gender.length">
+                  <Tag
+                    v-for="gender in selection.gender"
+                    :key="gender"
+                    :value="gender"
+                    severity="warning"
+                    class="summary-tag"
+                  />
+                </template>
+                <span v-else>—</span>
+              </dd>
+            </div>
+            <div>
+              <dt>Content format</dt>
+              <dd>
+                <template v-if="selection.contentFormat && selection.contentFormat.length">
+                  <Tag
+                    v-for="format in selection.contentFormat"
+                    :key="format"
+                    :value="format"
+                    severity="help"
+                    class="summary-tag"
+                  />
+                </template>
+                <span v-else>—</span>
+              </dd>
+            </div>
+            <div>
               <dt>Previous collaborations</dt>
               <dd>
                 <template v-if="selection.previousCollaborations && selection.previousCollaborations.length">
