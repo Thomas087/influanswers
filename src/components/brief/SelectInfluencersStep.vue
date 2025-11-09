@@ -38,6 +38,7 @@
           display="chip"
           :modelValue="modelValue.platforms"
           :options="platformOptions"
+          filter
           placeholder="Select platforms"
           @update:modelValue="updateField('platforms', $event)"
         />
@@ -71,6 +72,7 @@
           display="chip"
           :modelValue="modelValue.regions"
           :options="countryOptions"
+          filter
           placeholder="Select countries"
           @update:modelValue="updateField('regions', $event)"
         />
@@ -139,7 +141,18 @@ const emit = defineEmits<{
   'update:modelValue': [value: InfluencerSelection]
 }>()
 
-const platformOptions = ['Instagram', 'TikTok', 'YouTube', 'LinkedIn', 'Pinterest', 'Twitch']
+const platformOptions = [
+  'Instagram',
+  'TikTok',
+  'YouTube',
+  'LinkedIn',
+  'Twitter',
+  'Twitch',
+  'Red',
+  'Facebook',
+  'WeChat',
+  'Douyin',
+]
 
 const groupedCategories = [
   {
