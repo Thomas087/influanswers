@@ -18,7 +18,12 @@
           :max="500"
           class="influencer-count-input"
         />
-        <Slider v-model="numberOfInfluencersValue" :min="10" :max="500" class="w-24" />
+        <Slider
+          v-model="numberOfInfluencersValue"
+          :min="10"
+          :max="500"
+          class="influencer-count-slider"
+        />
         <Message v-if="isInfluencerCountInvalid" severity="error" size="small" variant="simple">
           {{ influencerCountErrorMessage }}
         </Message>
@@ -368,25 +373,6 @@ const influencerCountErrorMessage = computed(() => {
   return ''
 })
 
-// Sync ref with prop changes (from parent)
-watch(
-  () => props.modelValue.numberOfInfluencers,
-  (newValue) => {
-    const clampedValue = Math.max(10, Math.min(500, newValue || 10))
-    if (clampedValue !== numberOfInfluencersValue.value) {
-      numberOfInfluencersValue.value = clampedValue
-    }
-  },
-)
-
-// Watch ref changes and update parent (from user input)
-watch(numberOfInfluencersValue, (newValue) => {
-  // Only update if value is valid
-  if (!isNaN(newValue) && newValue >= 10 && newValue <= 500) {
-    updateField('numberOfInfluencers', newValue)
-  }
-})
-
 const previousCollaborationsValue = computed({
   get: () => props.modelValue.previousCollaborations || [],
   set: (value: string[]) => {
@@ -467,5 +453,9 @@ const updateField = <K extends keyof InfluencerSelection>(
 
 .influencer-count-input {
   width: 120px;
+}
+
+.influencer-count-slider {
+  max-width: 150px;
 }
 </style>
