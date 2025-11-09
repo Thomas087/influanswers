@@ -7,6 +7,21 @@
       </p>
     </div>
 
+    <div class="form-field form-field--full">
+      <label class="field-label" for="number-of-influencers">Number of influencers</label>
+      <div class="influencer-count-controls">
+        <InputText
+          id="number-of-influencers"
+          v-model.number="numberOfInfluencersValue as any"
+          type="number"
+          :min="10"
+          :max="500"
+          class="influencer-count-input"
+        />
+        <Slider v-model="numberOfInfluencersValue" :min="10" :max="500" class="w-24" />
+      </div>
+    </div>
+
     <div class="form-grid">
       <div class="form-field">
         <label class="field-label" for="platforms">Preferred platforms</label>
@@ -88,10 +103,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import AutoComplete from 'primevue/autocomplete'
 import Dropdown from 'primevue/dropdown'
+import InputText from 'primevue/inputtext'
 import MultiSelect from 'primevue/multiselect'
+import Slider from 'primevue/slider'
 import Textarea from 'primevue/textarea'
 
 import type { InfluencerSelection } from '@/types/brief'
@@ -128,6 +145,8 @@ const audienceSizeOptions = [
 ]
 
 const suggestions = ref<string[]>([])
+
+const numberOfInfluencersValue = ref(props.modelValue.numberOfInfluencers || 10)
 
 const previousCollaborationsValue = computed({
   get: () => props.modelValue.previousCollaborations || [],
@@ -199,5 +218,15 @@ const updateField = <K extends keyof InfluencerSelection>(
   font-size: 14px;
   font-weight: 500;
   color: #2d3748;
+}
+
+.influencer-count-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.influencer-count-input {
+  width: 120px;
 }
 </style>

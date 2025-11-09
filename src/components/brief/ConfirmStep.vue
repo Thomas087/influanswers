@@ -51,6 +51,10 @@
         <div class="summary-body">
           <dl>
             <div>
+              <dt>Number of influencers</dt>
+              <dd>{{ selection.numberOfInfluencers || '—' }}</dd>
+            </div>
+            <div>
               <dt>Platforms</dt>
               <dd>
                 <template v-if="selection.platforms.length">

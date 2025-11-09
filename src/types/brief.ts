@@ -8,6 +8,7 @@ export interface BriefDetails {
 }
 
 export interface InfluencerSelection {
+  numberOfInfluencers: number
   platforms: string[]
   categories: string[]
   regions: string[]

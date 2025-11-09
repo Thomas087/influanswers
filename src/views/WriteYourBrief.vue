@@ -118,6 +118,7 @@ const brief = reactive<BriefDetails>({
 })
 
 const selection = reactive<InfluencerSelection>({
+  numberOfInfluencers: 10,
   platforms: [],
   categories: [],
   regions: [],
@@ -298,6 +299,7 @@ const submitBrief = async () => {
       timeline: '',
     })
     Object.assign(selection, {
+      numberOfInfluencers: 10,
       platforms: [],
       categories: [],
       regions: [],
