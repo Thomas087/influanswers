@@ -13,8 +13,8 @@
     <div class="form-field">
       <Textarea
         id="project-description"
-        :modelValue="modelValue.brandBrief"
-        @update:modelValue="updateField('brandBrief', $event)"
+        :modelValue="briefStore.brief.brandBrief"
+        @update:modelValue="briefStore.updateBriefField('brandBrief', $event || '')"
         rows="12"
         auto-resize
         placeholder="Enter your project details here..."
@@ -25,28 +25,9 @@
 
 <script setup lang="ts">
 import Textarea from 'primevue/textarea'
+import { useBriefStore } from '@/stores/brief'
 
-import type { BriefDetails } from '@/types/brief'
-
-const props = defineProps<{
-  modelValue: BriefDetails
-}>()
-
-const emit = defineEmits<{
-  'update:modelValue': [value: BriefDetails]
-}>()
-
-const updateField = <K extends keyof BriefDetails>(
-  field: K,
-  value: BriefDetails[K] | undefined,
-) => {
-  if (value !== undefined) {
-    emit('update:modelValue', {
-      ...props.modelValue,
-      [field]: value,
-    })
-  }
-}
+const briefStore = useBriefStore()
 </script>
 
 <style scoped>

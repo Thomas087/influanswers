@@ -42,107 +42,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, nextTick } from 'vue'
+import { computed } from 'vue'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
+import { useBriefStore } from '@/stores/brief'
 
-import type { BriefDetails } from '@/types/brief'
+const briefStore = useBriefStore()
 
-const props = defineProps<{
-  modelValue: BriefDetails
-}>()
+// Get questions list from store (includes empty slots for UI)
+const questionsList = computed(() => briefStore.getQuestionsList())
 
-const emit = defineEmits<{
-  'update:modelValue': [value: BriefDetails]
-}>()
-
-const questionsList = ref<string[]>(
-  props.modelValue.questions && props.modelValue.questions.length > 0
-    ? [...props.modelValue.questions]
-    : ['', '', ''],
-)
-
-const showValidationError = ref(false)
-const isUpdatingFromParent = ref(false)
-
-// Initialize validation error state
-onMounted(() => {
-  const validQuestions = questionsList.value.filter((q) => q.trim().length > 0)
-  showValidationError.value = validQuestions.length < 3
-})
-
-// Watch for external changes to modelValue (only sync if different)
-watch(
-  () => props.modelValue.questions,
-  (newQuestions) => {
-    if (isUpdatingFromParent.value) return
-
-    const currentValid = questionsList.value.filter((q) => q.trim().length > 0)
-    const newValid = newQuestions ? newQuestions.filter((q) => q.trim().length > 0) : []
-
-    // Only update if the valid questions are actually different
-    if (JSON.stringify(currentValid) !== JSON.stringify(newValid)) {
-      if (newQuestions && newQuestions.length > 0) {
-        questionsList.value = [...newQuestions]
-      } else if (questionsList.value.length === 0) {
-        questionsList.value = ['', '', '']
-      }
-    }
-  },
-  { deep: true },
-)
-
-// Watch questionsList and emit updates
-watch(
-  questionsList,
-  (newList) => {
-    if (isUpdatingFromParent.value) return
-
-    const validQuestions = newList.filter((q) => q.trim().length > 0)
-    const currentValid = props.modelValue.questions || []
-
-    // Only emit if the valid questions actually changed
-    if (JSON.stringify(validQuestions) !== JSON.stringify(currentValid)) {
-      isUpdatingFromParent.value = true
-      emit('update:modelValue', {
-        ...props.modelValue,
-        questions: validQuestions,
-      })
-      // Use nextTick to reset the flag after the parent has processed the update
-      nextTick(() => {
-        isUpdatingFromParent.value = false
-      })
-    }
-
-    // Show validation error if less than 3 valid questions
-    showValidationError.value = validQuestions.length < 3
-  },
-  { deep: true, immediate: true },
-)
+const showValidationError = computed(() => !briefStore.isQuestionsValid)
 
 const updateQuestion = (index: number, value: string) => {
-  questionsList.value[index] = value
+  briefStore.updateQuestion(index, value)
 }
 
 const addQuestion = () => {
-  questionsList.value.push('')
+  briefStore.addQuestion()
 }
 
 const removeQuestion = (index: number) => {
-  if (questionsList.value.length > 3) {
-    questionsList.value.splice(index, 1)
-  }
+  briefStore.removeQuestion(index)
 }
-
-// Expose validation method for parent component
-defineExpose({
-  validate: () => {
-    const validQuestions = questionsList.value.filter((q) => q.trim().length > 0)
-    const isValid = validQuestions.length >= 3
-    showValidationError.value = !isValid
-    return isValid
-  },
-})
 </script>
 
 <style scoped>

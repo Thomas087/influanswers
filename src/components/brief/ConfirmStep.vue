@@ -17,22 +17,22 @@
           <dl>
             <div>
               <dt>Project name</dt>
-              <dd>{{ brief.projectName || '—' }}</dd>
+              <dd>{{ briefStore.brief.projectName || '—' }}</dd>
             </div>
             <div>
               <dt>Summary</dt>
-              <dd>{{ brief.brandBrief || '—' }}</dd>
+              <dd>{{ briefStore.brief.brandBrief || '—' }}</dd>
             </div>
             <div>
               <dt>Objectives</dt>
-              <dd>{{ brief.keyObjectives || '—' }}</dd>
+              <dd>{{ briefStore.brief.keyObjectives || '—' }}</dd>
             </div>
             <div>
               <dt>Key questions</dt>
               <dd>
-                <template v-if="brief.questions && brief.questions.length > 0">
+                <template v-if="briefStore.brief.questions && briefStore.brief.questions.length > 0">
                   <ul class="questions-list">
-                    <li v-for="(question, index) in brief.questions" :key="index">
+                    <li v-for="(question, index) in briefStore.brief.questions" :key="index">
                       {{ question }}
                     </li>
                   </ul>
@@ -52,14 +52,14 @@
           <dl>
             <div>
               <dt>Number of influencers</dt>
-              <dd>{{ selection.numberOfInfluencers || '—' }}</dd>
+              <dd>{{ briefStore.selection.numberOfInfluencers || '—' }}</dd>
             </div>
             <div>
               <dt>Platforms</dt>
               <dd>
-                <template v-if="selection.platforms.length">
+                <template v-if="briefStore.selection.platforms.length">
                   <Tag
-                    v-for="platform in selection.platforms"
+                    v-for="platform in briefStore.selection.platforms"
                     :key="platform"
                     :value="platform"
                     class="summary-tag"
@@ -71,9 +71,9 @@
             <div>
               <dt>Categories</dt>
               <dd>
-                <template v-if="selection.categories.length">
+                <template v-if="briefStore.selection.categories.length">
                   <Tag
-                    v-for="category in selection.categories"
+                    v-for="category in briefStore.selection.categories"
                     :key="category"
                     :value="category"
                     severity="secondary"
@@ -86,9 +86,9 @@
             <div>
               <dt>Regions</dt>
               <dd>
-                <template v-if="selection.regions.length">
+                <template v-if="briefStore.selection.regions.length">
                   <Tag
-                    v-for="region in selection.regions"
+                    v-for="region in briefStore.selection.regions"
                     :key="region"
                     :value="region"
                     severity="info"
@@ -100,14 +100,14 @@
             </div>
             <div>
               <dt>Audience size</dt>
-              <dd>{{ selection.audienceSize || '—' }}</dd>
+              <dd>{{ briefStore.selection.audienceSize || '—' }}</dd>
             </div>
             <div>
               <dt>Gender</dt>
               <dd>
-                <template v-if="selection.gender && selection.gender.length">
+                <template v-if="briefStore.selection.gender && briefStore.selection.gender.length">
                   <Tag
-                    v-for="gender in selection.gender"
+                    v-for="gender in briefStore.selection.gender"
                     :key="gender"
                     :value="gender"
                     severity="warning"
@@ -120,9 +120,11 @@
             <div>
               <dt>Content format</dt>
               <dd>
-                <template v-if="selection.contentFormat && selection.contentFormat.length">
+                <template
+                  v-if="briefStore.selection.contentFormat && briefStore.selection.contentFormat.length"
+                >
                   <Tag
-                    v-for="format in selection.contentFormat"
+                    v-for="format in briefStore.selection.contentFormat"
                     :key="format"
                     :value="format"
                     severity="help"
@@ -135,9 +137,14 @@
             <div>
               <dt>Previous collaborations</dt>
               <dd>
-                <template v-if="selection.previousCollaborations && selection.previousCollaborations.length">
+                <template
+                  v-if="
+                    briefStore.selection.previousCollaborations &&
+                    briefStore.selection.previousCollaborations.length
+                  "
+                >
                   <Tag
-                    v-for="collab in selection.previousCollaborations"
+                    v-for="collab in briefStore.selection.previousCollaborations"
                     :key="collab"
                     :value="collab"
                     severity="success"
@@ -149,7 +156,7 @@
             </div>
             <div>
               <dt>Notes</dt>
-              <dd>{{ selection.additionalNotes || '—' }}</dd>
+              <dd>{{ briefStore.selection.additionalNotes || '—' }}</dd>
             </div>
           </dl>
         </div>
@@ -163,11 +170,11 @@
           <dl>
             <div>
               <dt>Budget range</dt>
-              <dd>{{ brief.budgetRange || '—' }}</dd>
+              <dd>{{ briefStore.brief.budgetRange || '—' }}</dd>
             </div>
             <div>
               <dt>Timeline</dt>
-              <dd>{{ brief.timeline || '—' }}</dd>
+              <dd>{{ briefStore.brief.timeline || '—' }}</dd>
             </div>
           </dl>
           <slot name="actions" />
@@ -179,13 +186,9 @@
 
 <script setup lang="ts">
 import Tag from 'primevue/tag'
+import { useBriefStore } from '@/stores/brief'
 
-import type { BriefDetails, InfluencerSelection } from '@/types/brief'
-
-defineProps<{
-  brief: BriefDetails
-  selection: InfluencerSelection
-}>()
+const briefStore = useBriefStore()
 </script>
 
 <style scoped>
@@ -289,4 +292,3 @@ defineProps<{
   font-weight: 600;
 }
 </style>
-

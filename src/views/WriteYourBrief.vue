@@ -33,18 +33,10 @@
 
           <StepPanels>
             <StepPanel v-for="step in steps" :key="step.value" :value="step.value">
-              <WriteBriefStep
-                v-if="step.value === 1"
-                :model-value="brief"
-                @update:model-value="(value) => Object.assign(brief, value)"
-              />
-              <QuestionsStep
-                v-else-if="step.value === 2"
-                :model-value="brief"
-                @update:model-value="(value) => Object.assign(brief, value)"
-              />
-              <SelectInfluencersStep v-else-if="step.value === 3" v-model="selection" />
-              <ConfirmStep v-else-if="step.value === 4" :brief="brief" :selection="selection">
+              <WriteBriefStep v-if="step.value === 1" />
+              <QuestionsStep v-else-if="step.value === 2" />
+              <SelectInfluencersStep v-else-if="step.value === 3" />
+              <ConfirmStep v-else-if="step.value === 4">
                 <template #actions>
                   <div class="logistics-actions">
                     <p>{{ step.slot }}</p>
@@ -86,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue'
+import { ref, computed } from 'vue'
 import Button from 'primevue/button'
 import Stepper from 'primevue/stepper'
 import StepList from 'primevue/steplist'
@@ -100,49 +92,14 @@ import ConfirmStep from '@/components/brief/ConfirmStep.vue'
 import QuestionsStep from '@/components/brief/QuestionsStep.vue'
 import SelectInfluencersStep from '@/components/brief/SelectInfluencersStep.vue'
 import WriteBriefStep from '@/components/brief/WriteBriefStep.vue'
-import type { BriefDetails, InfluencerSelection } from '@/types/brief'
+import { useBriefStore } from '@/stores/brief'
 import { supabase } from '@/lib/supabase'
 
 const activeStep = ref(1)
 const isSubmitting = ref(false)
 const isProcessingChatGPT = ref(false)
 const toast = useToast()
-
-const brief = reactive<BriefDetails>({
-  projectName: '',
-  brandBrief: '',
-  keyObjectives: '',
-  questions: [],
-  budgetRange: '',
-  timeline: '',
-})
-
-const selection = reactive<InfluencerSelection>({
-  numberOfInfluencers: 10,
-  platforms: [],
-  categories: [],
-  regions: [],
-  audienceSize: '',
-  gender: [],
-  contentFormat: [],
-  previousCollaborations: [],
-  additionalNotes: '',
-})
-
-const isBriefValid = computed(() => brief.brandBrief.trim().length > 0)
-
-const isQuestionsValid = computed(() => {
-  const validQuestions = brief.questions.filter((q) => q.trim().length > 0)
-  return validQuestions.length >= 3
-})
-
-const isSelectionValid = computed(
-  () => selection.platforms.length > 0 || selection.categories.length > 0,
-)
-
-const canSubmit = computed(
-  () => isBriefValid.value && isQuestionsValid.value && isSelectionValid.value,
-)
+const briefStore = useBriefStore()
 
 const steps = computed(() => [
   {
@@ -154,7 +111,7 @@ const steps = computed(() => [
     nextIconPos: 'right',
     nextSeverity: undefined,
     isSubmit: false,
-    isDisabled: () => !isBriefValid.value,
+    isDisabled: () => !briefStore.isBriefValid,
   },
   {
     value: 2,
@@ -165,7 +122,7 @@ const steps = computed(() => [
     nextIconPos: 'right',
     nextSeverity: undefined,
     isSubmit: false,
-    isDisabled: () => !isQuestionsValid.value,
+    isDisabled: () => !briefStore.isQuestionsValid,
   },
   {
     value: 3,
@@ -176,7 +133,7 @@ const steps = computed(() => [
     nextIconPos: 'right',
     nextSeverity: undefined,
     isSubmit: false,
-    isDisabled: () => !isSelectionValid.value,
+    isDisabled: () => !briefStore.isSelectionValid,
   },
   {
     value: 4,
@@ -188,7 +145,7 @@ const steps = computed(() => [
     nextIconPos: undefined,
     nextSeverity: 'success',
     isSubmit: true,
-    isDisabled: () => !canSubmit.value,
+    isDisabled: () => !briefStore.canSubmit,
   },
 ])
 
@@ -196,7 +153,7 @@ const nextStep = async () => {
   console.log('nextStep called, current step:', activeStep.value)
 
   // If moving from step 1 to step 2, call ChatGPT API first
-  if (activeStep.value === 1 && brief.brandBrief.trim()) {
+  if (activeStep.value === 1 && briefStore.brief.brandBrief.trim()) {
     try {
       console.log('Calling ChatGPT API...')
       await handleChatGPTRequest()
@@ -230,7 +187,7 @@ const handleChatGPTRequest = async () => {
     // Call the Supabase Edge Function
     const { data, error } = await supabase.functions.invoke('chatgpt-brief', {
       body: {
-        brandSummary: brief.brandBrief,
+        brandSummary: briefStore.brief.brandBrief,
       },
     })
 
@@ -278,7 +235,7 @@ const prevStep = () => {
 }
 
 const submitBrief = async () => {
-  if (!canSubmit.value || isSubmitting.value) return
+  if (!briefStore.canSubmit || isSubmitting.value) return
 
   isSubmitting.value = true
 
@@ -292,23 +249,7 @@ const submitBrief = async () => {
       life: 5000,
     })
 
-    Object.assign(brief, {
-      projectName: '',
-      brandBrief: '',
-      keyObjectives: '',
-      questions: [],
-      budgetRange: '',
-      timeline: '',
-    })
-    Object.assign(selection, {
-      numberOfInfluencers: 10,
-      platforms: [],
-      categories: [],
-      regions: [],
-      audienceSize: '',
-      previousCollaborations: [],
-      additionalNotes: '',
-    })
+    briefStore.reset()
     activeStep.value = 1
   } catch (error) {
     console.error(error)

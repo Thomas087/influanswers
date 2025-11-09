@@ -36,11 +36,11 @@
         <MultiSelect
           id="platforms"
           display="chip"
-          :modelValue="modelValue.platforms"
+          :modelValue="briefStore.selection.platforms"
           :options="platformOptions"
           filter
           placeholder="Select platforms"
-          @update:modelValue="updateField('platforms', $event)"
+          @update:modelValue="briefStore.updateSelectionField('platforms', $event || [])"
         />
       </div>
 
@@ -70,11 +70,11 @@
         <MultiSelect
           id="regions"
           display="chip"
-          :modelValue="modelValue.regions"
+          :modelValue="briefStore.selection.regions"
           :options="countryOptions"
           filter
           placeholder="Select countries"
-          @update:modelValue="updateField('regions', $event)"
+          @update:modelValue="briefStore.updateSelectionField('regions', $event || [])"
         />
       </div>
 
@@ -82,10 +82,10 @@
         <label class="field-label" for="audience-size">Audience size</label>
         <Dropdown
           id="audience-size"
-          :modelValue="modelValue.audienceSize"
+          :modelValue="briefStore.selection.audienceSize"
           :options="audienceSizeOptions"
           placeholder="Select an audience tier"
-          @update:modelValue="updateField('audienceSize', $event)"
+          @update:modelValue="briefStore.updateSelectionField('audienceSize', $event || '')"
         />
       </div>
 
@@ -94,11 +94,11 @@
         <MultiSelect
           id="gender"
           display="chip"
-          :modelValue="modelValue.gender"
+          :modelValue="briefStore.selection.gender"
           :options="genderOptions"
           filter
           placeholder="Select gender"
-          @update:modelValue="updateField('gender', $event)"
+          @update:modelValue="briefStore.updateSelectionField('gender', $event || [])"
         />
       </div>
 
@@ -107,11 +107,11 @@
         <MultiSelect
           id="content-format"
           display="chip"
-          :modelValue="modelValue.contentFormat"
+          :modelValue="briefStore.selection.contentFormat"
           :options="contentFormatOptions"
           filter
           placeholder="Select content format"
-          @update:modelValue="updateField('contentFormat', $event)"
+          @update:modelValue="briefStore.updateSelectionField('contentFormat', $event || [])"
         />
       </div>
 
@@ -136,8 +136,8 @@
         <label class="field-label" for="additional-notes">Additional notes</label>
         <Textarea
           id="additional-notes"
-          :modelValue="modelValue.additionalNotes"
-          @update:modelValue="updateField('additionalNotes', $event)"
+          :modelValue="briefStore.selection.additionalNotes"
+          @update:modelValue="briefStore.updateSelectionField('additionalNotes', $event || '')"
           rows="4"
           auto-resize
           placeholder="Share any extra filters or custom influencer lists."
@@ -156,16 +156,9 @@ import Message from 'primevue/message'
 import MultiSelect from 'primevue/multiselect'
 import Slider from 'primevue/slider'
 import Textarea from 'primevue/textarea'
+import { useBriefStore } from '@/stores/brief'
 
-import type { InfluencerSelection } from '@/types/brief'
-
-const props = defineProps<{
-  modelValue: InfluencerSelection
-}>()
-
-const emit = defineEmits<{
-  'update:modelValue': [value: InfluencerSelection]
-}>()
+const briefStore = useBriefStore()
 
 const platformOptions = [
   'Instagram',
@@ -489,7 +482,12 @@ const contentFormatOptions = ['Video', 'Reels', 'Photos', 'Live streams', 'Blog'
 
 const suggestions = ref<string[]>([])
 
-const numberOfInfluencersValue = ref(props.modelValue.numberOfInfluencers || 10)
+const numberOfInfluencersValue = computed({
+  get: () => briefStore.selection.numberOfInfluencers || 10,
+  set: (value: number) => {
+    briefStore.updateSelectionField('numberOfInfluencers', value)
+  },
+})
 
 // Validation for influencer count
 const isInfluencerCountInvalid = computed(() => {
@@ -512,16 +510,16 @@ const influencerCountErrorMessage = computed(() => {
 })
 
 const previousCollaborationsValue = computed({
-  get: () => props.modelValue.previousCollaborations || [],
+  get: () => briefStore.selection.previousCollaborations || [],
   set: (value: string[]) => {
-    updateField('previousCollaborations', value)
+    briefStore.updateSelectionField('previousCollaborations', value)
   },
 })
 
 const selectedCategories = computed({
-  get: () => props.modelValue.categories || [],
+  get: () => briefStore.selection.categories || [],
   set: (value: string[]) => {
-    updateField('categories', value)
+    briefStore.updateSelectionField('categories', value)
   },
 })
 
@@ -530,16 +528,6 @@ const search = () => {
   // For now, we'll return an empty array since typehead is disabled
   // Users can type and press Enter to add items
   suggestions.value = []
-}
-
-const updateField = <K extends keyof InfluencerSelection>(
-  field: K,
-  value: InfluencerSelection[K],
-) => {
-  emit('update:modelValue', {
-    ...props.modelValue,
-    [field]: value,
-  })
 }
 </script>
 
