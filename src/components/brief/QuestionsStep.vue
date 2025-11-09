@@ -8,12 +8,14 @@
     </div>
     <div class="questions-list">
       <div v-for="(question, index) in questionsList" :key="index" class="question-item">
-        <InputText
+        <Textarea
           :id="`question-${index}`"
           :modelValue="question"
           @update:modelValue="updateQuestion(index, $event || '')"
           placeholder="Enter a question..."
           class="question-input"
+          auto-resize
+          rows="1"
         />
 
         <Button
@@ -41,7 +43,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import InputText from 'primevue/inputtext'
+import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
 
 import type { BriefDetails } from '@/types/brief'
@@ -152,7 +154,7 @@ defineExpose({
 
 .question-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
 }
 
@@ -165,6 +167,8 @@ defineExpose({
   height: 2.5rem;
   color: #6348ed;
   background-color: #fff;
+  flex-shrink: 0;
+  margin-top: 0.5rem;
 }
 
 .delete-button:disabled {
