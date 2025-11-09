@@ -44,7 +44,7 @@
                 </template>
               </ConfirmStep>
               <div class="step-footer">
-                <div v-if="!step.showBack"></div>
+                <div v-if="!step.showBack && !step.showNextButton"></div>
                 <Button
                   v-if="step.showBack"
                   label="Back"
@@ -53,7 +53,44 @@
                   outlined
                   @click="prevStep"
                 />
+                <template v-if="step.value === 1 && step.showNextButton">
+                  <!-- Show both buttons when other steps have content -->
+                  <div class="step-footer-buttons">
+                    <Button
+                      label="Next"
+                      icon="pi pi-arrow-right"
+                      icon-pos="right"
+                      severity="secondary"
+                      outlined
+                      :disabled="step.isDisabled?.() ?? false"
+                      @click="
+                        () => {
+                          if (activeStep < steps.length) activeStep++
+                        }
+                      "
+                    />
+                    <Button
+                      :label="step.nextLabel"
+                      :icon="step.nextIcon"
+                      :icon-pos="step.nextIconPos"
+                      :severity="step.nextSeverity"
+                      :loading="isProcessingChatGPT"
+                      :disabled="(step.isDisabled?.() ?? false) || isProcessingChatGPT"
+                      @click="
+                        async () => {
+                          try {
+                            await handleChatGPTRequest()
+                            if (activeStep < steps.length) activeStep++
+                          } catch (error) {
+                            // Error already handled in handleChatGPTRequest
+                          }
+                        }
+                      "
+                    />
+                  </div>
+                </template>
                 <Button
+                  v-else
                   :label="step.nextLabel"
                   :icon="step.nextIcon"
                   :icon-pos="step.nextIconPos"
@@ -101,17 +138,37 @@ const isProcessingChatGPT = ref(false)
 const toast = useToast()
 const briefStore = useBriefStore()
 
+// Check if other steps have content
+const hasOtherStepsContent = computed(() => {
+  // Check if questions step has content (any non-empty questions)
+  const hasQuestions = briefStore.questions?.some((q) => q?.trim().length > 0) ?? false
+
+  // Check if influencer step has content (additionalNotes or any selection data)
+  const hasInfluencerDescription =
+    briefStore.selection.additionalNotes?.trim().length > 0 ||
+    briefStore.selection.platforms.length > 0 ||
+    briefStore.selection.categories.length > 0 ||
+    briefStore.selection.regions.length > 0 ||
+    briefStore.selection.audienceSize.length > 0 ||
+    briefStore.selection.gender.length > 0 ||
+    briefStore.selection.contentFormat.length > 0 ||
+    briefStore.selection.previousCollaborations.length > 0
+
+  return hasQuestions || hasInfluencerDescription
+})
+
 const steps = computed(() => [
   {
     value: 1,
     label: 'Write your brief',
     showBack: false,
-    nextLabel: 'Continue',
+    nextLabel: hasOtherStepsContent.value ? 'Generate a new brief' : 'Generate a brief',
     nextIcon: 'pi pi-arrow-right',
     nextIconPos: 'right',
     nextSeverity: undefined,
     isSubmit: false,
     isDisabled: () => !briefStore.isBriefValid,
+    showNextButton: hasOtherStepsContent.value, // Show secondary "Next" button if other steps have content
   },
   {
     value: 2,
@@ -325,6 +382,12 @@ const submitBrief = async () => {
   display: flex;
   justify-content: space-between;
   gap: 16px;
+}
+
+.step-footer-buttons {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
 }
 
 .logistics-actions {
