@@ -1,6 +1,29 @@
 <template>
   <div class="brief-page">
     <Toast />
+
+    <!-- Fixed top header with breadcrumbs and close button -->
+    <div class="fixed-top-header">
+      <div class="top-header-content">
+        <nav class="breadcrumbs">
+          <button class="breadcrumb-item" @click="router.push('/')">Home</button>
+          <span class="breadcrumb-separator">/</span>
+          <span class="breadcrumb-item breadcrumb-item--current">
+            {{ currentStep?.label || 'Write your brief' }}
+          </span>
+        </nav>
+        <Button
+          icon="pi pi-times"
+          rounded
+          text
+          severity="secondary"
+          class="close-button"
+          @click="router.push('/')"
+          aria-label="Close and return to home"
+        />
+      </div>
+    </div>
+
     <div class="page-shell">
       <header>
         <div class="header-content">
@@ -124,6 +147,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import Stepper from 'primevue/stepper'
 import StepList from 'primevue/steplist'
@@ -140,6 +164,7 @@ import WriteBriefStep from '@/components/brief/WriteBriefStep.vue'
 import { useBriefStore } from '@/stores/brief'
 import { supabase } from '@/lib/supabase'
 
+const router = useRouter()
 const activeStep = ref(1)
 const isSubmitting = ref(false)
 const isProcessingChatGPT = ref(false)
@@ -444,7 +469,74 @@ const submitBrief = async () => {
   min-height: 100vh;
   background: linear-gradient(180deg, #f8fafc 0%, #ffffff 60%);
   padding: 64px 24px 120px;
+  padding-top: calc(32px + 48px); /* Reduced padding for fixed top header */
   padding-bottom: calc(96px + 80px); /* Extra padding for fixed bottom bar */
+}
+
+/* Fixed top header with breadcrumbs and close button */
+.fixed-top-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.8) 0%, rgba(255, 255, 255, 0.8) 60%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1000;
+  padding: 8px 0;
+}
+
+.top-header-content {
+  width: 100%;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.breadcrumb-item {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 14px;
+  color: #64748b;
+  cursor: pointer;
+  transition: color 0.2s;
+  font-family: inherit;
+}
+
+.breadcrumb-item:hover {
+  color: #6348ed;
+}
+
+.breadcrumb-item--current {
+  color: #0f172a;
+  font-weight: 500;
+  cursor: default;
+}
+
+.breadcrumb-separator {
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+.close-button {
+  width: 2rem;
+  height: 2rem;
+  color: #64748b;
+}
+
+.close-button:hover {
+  color: #0f172a;
+  background-color: #f1f5f9;
 }
 
 .page-shell {
@@ -452,13 +544,13 @@ const submitBrief = async () => {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: 32px;
 }
 
 .header-content {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .page-eyebrow,
@@ -476,15 +568,15 @@ const submitBrief = async () => {
 }
 
 .page-title {
-  font-size: 42px;
-  line-height: 1.15;
+  font-size: 36px;
+  line-height: 1.2;
   font-weight: 700;
   color: #0f172a;
 }
 
 .page-subtitle {
-  font-size: 18px;
-  line-height: 1.6;
+  font-size: 16px;
+  line-height: 1.5;
   color: #475569;
 }
 
@@ -545,16 +637,34 @@ const submitBrief = async () => {
 
 @media (max-width: 640px) {
   .brief-page {
-    padding: 48px 16px 72px;
+    padding: 32px 16px 72px;
+    padding-top: calc(24px + 40px); /* Reduced padding for fixed top header on mobile */
     padding-bottom: calc(72px + 80px); /* Extra padding for fixed bottom bar on mobile */
   }
 
   .page-title {
-    font-size: 32px;
+    font-size: 28px;
   }
 
   .stepper-section {
     padding: 24px 16px;
+  }
+
+  .fixed-top-header {
+    padding: 6px 0;
+  }
+
+  .top-header-content {
+    padding: 0 16px;
+  }
+
+  .breadcrumbs {
+    font-size: 13px;
+  }
+
+  .close-button {
+    width: 1.75rem;
+    height: 1.75rem;
   }
 
   .fixed-bottom-bar {
