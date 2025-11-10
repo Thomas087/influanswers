@@ -170,13 +170,40 @@
       </div>
 
       <div class="summary-right-column">
-        <!-- Reserved for payment -->
+        <article class="summary-card pricing-card">
+          <header class="summary-header">
+            <h3>Project fees</h3>
+          </header>
+          <div class="summary-body">
+            <div class="pricing-breakdown">
+              <div class="pricing-row">
+                <span class="pricing-label">Number of influencers</span>
+                <span class="pricing-value">{{ numberOfInfluencers }}</span>
+              </div>
+              <div class="pricing-row">
+                <span class="pricing-label">Number of questions</span>
+                <span class="pricing-value">{{ numberOfQuestions }}</span>
+              </div>
+              <div class="pricing-row">
+                <span class="pricing-label">Price per question</span>
+                <span class="pricing-value">$25</span>
+              </div>
+              <div class="pricing-row pricing-row--total">
+                <span class="pricing-label">Total</span>
+                <span class="pricing-value pricing-value--total"
+                  >${{ totalPrice.toLocaleString() }}</span
+                >
+              </div>
+            </div>
+          </div>
+        </article>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import Tag from 'primevue/tag'
 import { useBriefStore } from '@/stores/brief'
 import { getCountryName } from '@/lib/countries'
@@ -187,6 +214,18 @@ import { getContentFormatLabel } from '@/lib/content-formats'
 import { getCategoryLabel } from '@/lib/categories'
 
 const briefStore = useBriefStore()
+
+const numberOfQuestions = computed(() => {
+  return briefStore.questions.filter((q) => q?.trim().length > 0).length
+})
+
+const numberOfInfluencers = computed(() => {
+  return briefStore.selection.numberOfInfluencers || 0
+})
+
+const totalPrice = computed(() => {
+  return numberOfInfluencers.value * numberOfQuestions.value * 25
+})
 </script>
 
 <style scoped>
@@ -318,5 +357,56 @@ const briefStore = useBriefStore()
   font-size: 15px;
   color: #1f2937;
   line-height: 1.45;
+}
+
+.pricing-card {
+  position: sticky;
+  top: 24px;
+}
+
+.pricing-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pricing-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.pricing-label {
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.pricing-value {
+  font-size: 15px;
+  color: #1f2937;
+  font-weight: 500;
+  text-align: right;
+}
+
+.pricing-row--total {
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.pricing-row--total .pricing-label {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1a202c;
+  letter-spacing: -0.01em;
+}
+
+.pricing-value--total {
+  font-size: 28px;
+  font-weight: 700;
+  color: #6348ed;
+  letter-spacing: -0.02em;
 }
 </style>
