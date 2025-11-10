@@ -70,13 +70,21 @@
     </div>
 
     <div ref="paymentElementRef" class="payment-element-container"></div>
-    <Button
-      :label="`Pay $${totalPrice.toLocaleString()}`"
-      :loading="processing"
-      :disabled="processing || !stripe || !elements || !isFormValid"
-      class="payment-button"
-      @click="handleSubmit"
-    />
+    <div class="payment-submit-section">
+      <div class="payment-submit-header">
+        <h4 class="payment-submit-title">Pay deposit - $185</h4>
+        <p class="payment-submit-subtitle">
+          You will be able to preview part of the final report before paying the full project fee
+        </p>
+      </div>
+      <Button
+        label="Pay deposit - $185"
+        :loading="processing"
+        :disabled="processing || !stripe || !elements || !isFormValid"
+        class="payment-button"
+        @click="handleSubmit"
+      />
+    </div>
   </template>
 </template>
 
@@ -415,6 +423,32 @@ watch(
 /* Let Stripe handle its own layout - just ensure container doesn't interfere */
 .payment-element-container > * {
   width: 100%;
+}
+
+.payment-submit-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.payment-submit-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.payment-submit-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.payment-submit-subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.5;
 }
 
 .payment-button {

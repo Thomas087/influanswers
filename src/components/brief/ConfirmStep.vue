@@ -194,13 +194,17 @@
                   >${{ totalPrice.toLocaleString() }}</span
                 >
               </div>
+              <div class="pricing-row pricing-row--deposit">
+                <span class="pricing-label">Deposit</span>
+                <span class="pricing-value pricing-value--deposit">${{ depositAmount }}</span>
+              </div>
             </div>
           </div>
         </article>
 
         <article class="summary-card payment-card" v-if="totalPrice > 0">
           <PaymentForm
-            :amount="totalPrice"
+            :amount="depositAmount"
             :metadata="paymentMetadata"
             @success="handlePaymentSuccess"
             @error="handlePaymentError"
@@ -236,6 +240,8 @@ const numberOfInfluencers = computed(() => {
 const totalPrice = computed(() => {
   return numberOfInfluencers.value * numberOfQuestions.value * 25
 })
+
+const depositAmount = 185
 
 const paymentMetadata = computed(() => {
   return {
@@ -441,5 +447,17 @@ const handlePaymentError = (error: string) => {
   font-weight: 700;
   color: #6348ed;
   letter-spacing: -0.02em;
+}
+
+.pricing-row--deposit {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.pricing-value--deposit {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a202c;
 }
 </style>
