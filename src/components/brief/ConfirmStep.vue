@@ -90,7 +90,7 @@
                   <Tag
                     v-for="region in briefStore.selection.regions"
                     :key="region"
-                    :value="region"
+                    :value="getCountryName(region)"
                     severity="info"
                     class="summary-tag"
                   />
@@ -170,6 +170,7 @@
 <script setup lang="ts">
 import Tag from 'primevue/tag'
 import { useBriefStore } from '@/stores/brief'
+import { getCountryName } from '@/lib/countries'
 
 const briefStore = useBriefStore()
 </script>
