@@ -1,10 +1,8 @@
 export interface BriefDetails {
   projectName: string
   brandBrief: string
-  keyObjectives: string
+  briefSummary: string
   questions: string[]
-  budgetRange: string
-  timeline: string
 }
 
 export interface InfluencerSelection {
@@ -29,10 +27,8 @@ export const createDefaultBrief = (): Brief => ({
   brief: {
     projectName: '',
     brandBrief: '',
-    keyObjectives: '',
+    briefSummary: '',
     questions: ['', '', ''], // Start with 3 empty slots for UI
-    budgetRange: '',
-    timeline: '',
   },
   selection: {
     numberOfInfluencers: 10,

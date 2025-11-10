@@ -24,8 +24,8 @@
               <dd>{{ briefStore.brief.brandBrief || '—' }}</dd>
             </div>
             <div>
-              <dt>Objectives</dt>
-              <dd>{{ briefStore.brief.keyObjectives || '—' }}</dd>
+              <dt>Brief summary</dt>
+              <dd>{{ briefStore.brief.briefSummary || '—' }}</dd>
             </div>
             <div>
               <dt>Key questions</dt>
@@ -157,19 +157,9 @@
 
       <article class="summary-card summary-card--highlight">
         <header class="summary-header">
-          <h3>Logistics</h3>
+          <h3>Actions</h3>
         </header>
         <div class="summary-body">
-          <dl>
-            <div>
-              <dt>Budget range</dt>
-              <dd>{{ briefStore.brief.budgetRange || '—' }}</dd>
-            </div>
-            <div>
-              <dt>Timeline</dt>
-              <dd>{{ briefStore.brief.timeline || '—' }}</dd>
-            </div>
-          </dl>
           <slot name="actions" />
         </div>
       </article>
