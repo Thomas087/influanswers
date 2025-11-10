@@ -140,7 +140,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted } from 'vue'
+import { ref, computed, watch, onUnmounted, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import Stepper from 'primevue/stepper'
@@ -164,6 +164,11 @@ const isSubmitting = ref(false)
 const isProcessingChatGPT = ref(false)
 const toast = useToast()
 const briefStore = useBriefStore()
+
+// Load brief from Supabase on mount
+onMounted(async () => {
+  await briefStore.loadFromSupabase()
+})
 
 // Rotating loading messages
 const loadingMessages = [

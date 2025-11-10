@@ -2,8 +2,11 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import type { Brief, BriefDetails, InfluencerSelection } from '@/types/brief'
 import { createDefaultBrief } from '@/types/brief'
+import { supabase } from '@/lib/supabase'
 
 const STORAGE_KEY = 'influanswers-brief-draft'
+const SESSION_ID_KEY = 'influanswers-session-id'
+const BRIEF_ID_KEY = 'influanswers-brief-id'
 
 // Storage helpers
 const loadFromStorage = (): Brief => {
@@ -32,8 +35,54 @@ const saveToStorage = (state: Brief) => {
   }
 }
 
+// Session ID management
+const getOrCreateSessionId = (): string => {
+  try {
+    let sessionId = localStorage.getItem(SESSION_ID_KEY)
+    if (!sessionId) {
+      sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      localStorage.setItem(SESSION_ID_KEY, sessionId)
+    }
+    return sessionId
+  } catch (error) {
+    console.error('Failed to get/create session ID:', error)
+    return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  }
+}
+
+// Get or create brief ID
+const getBriefId = (): string | null => {
+  try {
+    return localStorage.getItem(BRIEF_ID_KEY)
+  } catch (error) {
+    console.error('Failed to get brief ID:', error)
+    return null
+  }
+}
+
+const setBriefId = (id: string | null) => {
+  try {
+    if (id) {
+      localStorage.setItem(BRIEF_ID_KEY, id)
+    } else {
+      localStorage.removeItem(BRIEF_ID_KEY)
+    }
+  } catch (error) {
+    console.error('Failed to set brief ID:', error)
+  }
+}
+
 export const useBriefStore = defineStore('brief', () => {
   const state = ref<Brief>(loadFromStorage())
+  const sessionId = ref<string>(getOrCreateSessionId())
+  const briefId = ref<string | null>(getBriefId())
+  const userInfo = ref<{
+    fullName?: string
+    company?: string
+    vatNumber?: string
+    email?: string
+  }>({})
+  const isSaving = ref(false)
 
   // Getters
   const brief = computed(() => state.value.brief)
@@ -57,10 +106,153 @@ export const useBriefStore = defineStore('brief', () => {
     () => isBriefValid.value && isQuestionsValid.value && isSelectionValid.value,
   )
 
+  // Save/update brief in Supabase
+  const saveToSupabase = async (): Promise<void> => {
+    if (isSaving.value) return
+
+    try {
+      isSaving.value = true
+
+      const briefData = {
+        session_id: sessionId.value,
+        project_name: state.value.brief.projectName || null,
+        brand_brief: state.value.brief.brandBrief || null,
+        brief_summary: state.value.brief.briefSummary || null,
+        questions: state.value.brief.questions || [],
+        number_of_influencers: state.value.selection.numberOfInfluencers || 10,
+        platforms: state.value.selection.platforms || [],
+        categories: state.value.selection.categories || [],
+        regions: state.value.selection.regions || [],
+        audience_size: state.value.selection.audienceSize || [],
+        gender: state.value.selection.gender || [],
+        content_format: state.value.selection.contentFormat || [],
+        previous_collaborations: state.value.selection.previousCollaborations || [],
+        additional_notes: state.value.selection.additionalNotes || null,
+        user_full_name: userInfo.value.fullName || null,
+        user_company: userInfo.value.company || null,
+        user_vat_number: userInfo.value.vatNumber || null,
+        user_email: userInfo.value.email || null,
+      }
+
+      if (briefId.value) {
+        // Update existing brief
+        const { data, error } = await supabase
+          .from('briefs')
+          .update(briefData)
+          .eq('id', briefId.value)
+          .select()
+          .single()
+
+        if (error) throw error
+      } else {
+        // Create new brief
+        const { data, error } = await supabase
+          .from('briefs')
+          .insert(briefData)
+          .select()
+          .single()
+
+        if (error) throw error
+        if (data?.id) {
+          briefId.value = data.id
+          setBriefId(data.id)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to save brief to Supabase:', error)
+      // Don't throw - we still want to save to localStorage
+    } finally {
+      isSaving.value = false
+    }
+  }
+
+  // Load brief from Supabase
+  const loadFromSupabase = async (): Promise<void> => {
+    try {
+      const currentSessionId = getOrCreateSessionId()
+      const currentBriefId = getBriefId()
+
+      let data = null
+
+      // Try to load by brief ID first, then by session ID
+      if (currentBriefId) {
+        const { data: briefData, error } = await supabase
+          .from('briefs')
+          .select('*')
+          .eq('id', currentBriefId)
+          .single()
+
+        if (error && error.code !== 'PGRST116') {
+          // PGRST116 is "not found" - that's okay
+          throw error
+        }
+        data = briefData
+      } else {
+        const { data: briefData, error } = await supabase
+          .from('briefs')
+          .select('*')
+          .eq('session_id', currentSessionId)
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (error && error.code !== 'PGRST116') {
+          throw error
+        }
+        data = briefData
+      }
+
+      if (data) {
+        // Update brief ID
+        briefId.value = data.id
+        setBriefId(data.id)
+
+        // Update state with loaded data
+        if (data.project_name) state.value.brief.projectName = data.project_name
+        if (data.brand_brief) state.value.brief.brandBrief = data.brand_brief
+        if (data.brief_summary) state.value.brief.briefSummary = data.brief_summary
+        if (data.questions) state.value.brief.questions = data.questions
+
+        if (data.number_of_influencers) state.value.selection.numberOfInfluencers = data.number_of_influencers
+        if (data.platforms) state.value.selection.platforms = data.platforms
+        if (data.categories) state.value.selection.categories = data.categories
+        if (data.regions) state.value.selection.regions = data.regions
+        if (data.audience_size) state.value.selection.audienceSize = data.audience_size
+        if (data.gender) state.value.selection.gender = data.gender
+        if (data.content_format) state.value.selection.contentFormat = data.content_format
+        if (data.previous_collaborations) state.value.selection.previousCollaborations = data.previous_collaborations
+        if (data.additional_notes) state.value.selection.additionalNotes = data.additional_notes
+
+        if (data.user_full_name) userInfo.value.fullName = data.user_full_name
+        if (data.user_company) userInfo.value.company = data.user_company
+        if (data.user_vat_number) userInfo.value.vatNumber = data.user_vat_number
+        if (data.user_email) userInfo.value.email = data.user_email
+
+        // Save to localStorage as well
+        saveToStorage(state.value)
+      }
+    } catch (error) {
+      console.error('Failed to load brief from Supabase:', error)
+      // Continue with localStorage data if Supabase load fails
+    }
+  }
+
+  // Update user information
+  function updateUserInfo(info: {
+    fullName?: string
+    company?: string
+    vatNumber?: string
+    email?: string
+  }) {
+    userInfo.value = { ...userInfo.value, ...info }
+    saveToSupabase()
+  }
+
   // Generic update function for brief fields
   function updateField<K extends keyof BriefDetails>(field: K, value: BriefDetails[K]) {
     state.value.brief[field] = value
     saveToStorage(state.value)
+    saveToSupabase()
   }
 
   // Generic update function for selection fields
@@ -70,6 +262,7 @@ export const useBriefStore = defineStore('brief', () => {
   ) {
     state.value.selection[field] = value
     saveToStorage(state.value)
+    saveToSupabase()
   }
 
   // Questions helpers
@@ -86,6 +279,7 @@ export const useBriefStore = defineStore('brief', () => {
     }
     state.value.brief.questions[index] = value
     saveToStorage(state.value)
+    saveToSupabase()
   }
 
   function addQuestion() {
@@ -94,6 +288,7 @@ export const useBriefStore = defineStore('brief', () => {
     if (state.value.brief.questions.length < 20) {
       state.value.brief.questions.push('')
       saveToStorage(state.value)
+      saveToSupabase()
     }
   }
 
@@ -101,6 +296,7 @@ export const useBriefStore = defineStore('brief', () => {
     if (state.value.brief.questions?.length > 3) {
       state.value.brief.questions.splice(index, 1)
       saveToStorage(state.value)
+      saveToSupabase()
     }
   }
 
@@ -116,7 +312,12 @@ export const useBriefStore = defineStore('brief', () => {
   // Reset
   function reset() {
     state.value = createDefaultBrief()
+    userInfo.value = {}
     localStorage.removeItem(STORAGE_KEY)
+    briefId.value = null
+    setBriefId(null)
+    // Create a new session ID for the next brief
+    sessionId.value = getOrCreateSessionId()
   }
 
   return {
@@ -124,6 +325,10 @@ export const useBriefStore = defineStore('brief', () => {
     brief,
     selection,
     questions,
+    userInfo,
+    briefId,
+    sessionId,
+    isSaving,
 
     // Validation
     isBriefValid,
@@ -138,6 +343,9 @@ export const useBriefStore = defineStore('brief', () => {
     addQuestion,
     removeQuestion,
     getQuestionsList,
+    updateUserInfo,
+    saveToSupabase,
+    loadFromSupabase,
     reset,
   }
 })

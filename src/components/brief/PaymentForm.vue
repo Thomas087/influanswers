@@ -94,6 +94,9 @@ import { loadStripe, type Stripe, type StripeElements } from '@stripe/stripe-js'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import { supabase } from '@/lib/supabase'
+import { useBriefStore } from '@/stores/brief'
+
+const briefStore = useBriefStore()
 
 const props = defineProps<{
   amount: number
@@ -291,8 +294,29 @@ const handleSubmit = async () => {
   }
 }
 
-// Check for payment success in URL
+// Watch form fields and save user info to store (only when user actually types)
+let isInitialLoad = true
+watch([fullName, company, vatNumber, email], () => {
+  if (isInitialLoad) {
+    isInitialLoad = false
+    return
+  }
+  briefStore.updateUserInfo({
+    fullName: fullName.value,
+    company: company.value,
+    vatNumber: vatNumber.value,
+    email: email.value,
+  })
+})
+
+// Load user info from store on mount
 onMounted(() => {
+  // Load existing user info from store if available
+  if (briefStore.userInfo.fullName) fullName.value = briefStore.userInfo.fullName
+  if (briefStore.userInfo.company) company.value = briefStore.userInfo.company
+  if (briefStore.userInfo.vatNumber) vatNumber.value = briefStore.userInfo.vatNumber
+  if (briefStore.userInfo.email) email.value = briefStore.userInfo.email
+
   const urlParams = new URLSearchParams(window.location.search)
   if (urlParams.get('payment') === 'success') {
     paymentSuccess.value = true
