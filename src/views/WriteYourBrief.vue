@@ -114,7 +114,7 @@
           </div>
         </template>
         <Button
-          v-else
+          v-else-if="currentStep.value !== 4"
           :label="
             currentStep.value === 1 && isProcessingChatGPT
               ? currentLoadingMessage
@@ -123,17 +123,14 @@
           :icon="currentStep.nextIcon"
           :icon-pos="currentStep.nextIconPos"
           :severity="currentStep.nextSeverity"
-          :loading="
-            (currentStep.isSubmit && isSubmitting) ||
-            (currentStep.value === 1 && isProcessingChatGPT)
-          "
+          :loading="currentStep.value === 1 && isProcessingChatGPT"
           :disabled="
             (currentStep.isDisabled?.() ?? false) ||
-            (currentStep.isSubmit && isSubmitting) ||
             (currentStep.value === 1 && isProcessingChatGPT)
           "
-          @click="() => (currentStep?.isSubmit ? submitBrief() : nextStep())"
+          @click="nextStep()"
         />
+        <div v-else class="bottom-bar-spacer"></div>
       </div>
     </div>
   </div>
@@ -160,7 +157,6 @@ import { supabase } from '@/lib/supabase'
 
 const router = useRouter()
 const activeStep = ref(1)
-const isSubmitting = ref(false)
 const isProcessingChatGPT = ref(false)
 const toast = useToast()
 const briefStore = useBriefStore()
@@ -279,11 +275,11 @@ const steps = computed(() => [
     label: 'Confirm',
     slot: 'Once you submit, our team will validate the audience, finalize pricing, and share a proposal.',
     showBack: true,
-    nextLabel: 'Submit brief',
-    nextIcon: 'pi pi-check',
-    nextIconPos: undefined,
-    nextSeverity: 'success',
-    isSubmit: true,
+    nextLabel: 'Continue',
+    nextIcon: 'pi pi-arrow-right',
+    nextIconPos: 'right',
+    nextSeverity: undefined,
+    isSubmit: false,
     isDisabled: () => !briefStore.canSubmit,
   },
 ])
@@ -430,36 +426,6 @@ const handleChatGPTRequest = async () => {
 
 const prevStep = () => {
   if (activeStep.value > 1) activeStep.value--
-}
-
-const submitBrief = async () => {
-  if (!briefStore.canSubmit || isSubmitting.value) return
-
-  isSubmitting.value = true
-
-  try {
-    await new Promise((resolve) => setTimeout(resolve, 800))
-
-    toast.add({
-      severity: 'success',
-      summary: 'Brief sent',
-      detail: 'Our team will reach out shortly to finalize the details.',
-      life: 5000,
-    })
-
-    briefStore.reset()
-    activeStep.value = 1
-  } catch (error) {
-    console.error(error)
-    toast.add({
-      severity: 'error',
-      summary: 'Submission failed',
-      detail: 'There was a problem sending your brief. Please try again.',
-      life: 5000,
-    })
-  } finally {
-    isSubmitting.value = false
-  }
 }
 </script>
 

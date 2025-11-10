@@ -203,6 +203,13 @@ export const useBriefStore = defineStore('brief', () => {
       }
 
       if (data) {
+        // Don't load briefs that have payment status (completed payments)
+        // These should not be reloaded into the store
+        if (data.payment_status) {
+          console.log('Brief has payment status, skipping load to allow fresh start')
+          return
+        }
+
         // Update brief ID
         briefId.value = data.id
         setBriefId(data.id)
@@ -316,7 +323,8 @@ export const useBriefStore = defineStore('brief', () => {
     localStorage.removeItem(STORAGE_KEY)
     briefId.value = null
     setBriefId(null)
-    // Create a new session ID for the next brief
+    // Clear old session ID and create a new one for the next brief
+    localStorage.removeItem(SESSION_ID_KEY)
     sessionId.value = getOrCreateSessionId()
   }
 

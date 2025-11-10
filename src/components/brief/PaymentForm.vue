@@ -80,7 +80,7 @@
       <Button
         label="Pay deposit - $185"
         :loading="processing"
-        :disabled="processing || !stripe || !elements || !isFormValid"
+        :disabled="processing || !isPaymentReady"
         class="payment-button"
         @click="handleSubmit"
       />
@@ -90,12 +90,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
 import { loadStripe, type Stripe, type StripeElements } from '@stripe/stripe-js'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import { supabase } from '@/lib/supabase'
 import { useBriefStore } from '@/stores/brief'
 
+const router = useRouter()
 const briefStore = useBriefStore()
 
 const props = defineProps<{
@@ -116,6 +118,8 @@ const processing = ref(false)
 const error = ref<string | null>(null)
 const paymentSuccess = ref(false)
 const clientSecret = ref<string | null>(null)
+const paymentIntentId = ref<string | null>(null)
+const isPaymentElementComplete = ref(false)
 
 // Form fields
 const fullName = ref('')
@@ -164,10 +168,49 @@ const isFormValid = computed(() => {
   )
 })
 
+// Check if payment is ready (form valid + payment element complete)
+const isPaymentReady = computed(() => {
+  return isFormValid.value && isPaymentElementComplete.value && stripe.value && elements.value
+})
+
+// Save payment information to Supabase
+const savePaymentToSupabase = async (intentId: string, status: string) => {
+  try {
+    // Ensure brief is saved to Supabase first
+    await briefStore.saveToSupabase()
+
+    const briefId = briefStore.briefId
+
+    if (!briefId) {
+      console.warn('No brief ID available after saving, cannot save payment information')
+      return
+    }
+
+    const { error: updateError } = await supabase
+      .from('briefs')
+      .update({
+        payment_intent_id: intentId,
+        payment_status: status,
+      })
+      .eq('id', briefId)
+
+    if (updateError) {
+      console.error('Error updating brief with payment information:', updateError)
+      throw updateError
+    }
+
+    console.log('Payment information saved to Supabase:', { intentId, status, briefId })
+  } catch (err) {
+    console.error('Failed to save payment information to Supabase:', err)
+    throw err
+  }
+}
+
 const initializePayment = async () => {
   try {
     loading.value = true
     error.value = null
+    isPaymentElementComplete.value = false
 
     // Get Stripe publishable key from environment
     const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
@@ -211,6 +254,12 @@ const initializePayment = async () => {
     }
 
     clientSecret.value = data.clientSecret
+    paymentIntentId.value = data.paymentIntentId || null
+
+    // Store payment intent ID in localStorage for redirect case
+    if (paymentIntentId.value) {
+      localStorage.setItem('influanswers-payment-intent-id', paymentIntentId.value)
+    }
 
     // Create Elements instance
     const elementsInstance = stripeInstance.elements({
@@ -244,6 +293,11 @@ const initializePayment = async () => {
 
     const paymentElement = elementsInstance.create('payment')
     paymentElement.mount(paymentElementRef.value)
+
+    // Listen to payment element changes to track completeness
+    paymentElement.on('change', (event: any) => {
+      isPaymentElementComplete.value = event.complete || false
+    })
   } catch (err) {
     console.error('Payment initialization error:', err)
     error.value = err instanceof Error ? err.message : 'Failed to initialize payment'
@@ -265,7 +319,7 @@ const handleSubmit = async () => {
     processing.value = true
     error.value = null
 
-    const { error: confirmError } = await stripe.value.confirmPayment({
+    const { error: confirmError, paymentIntent } = await stripe.value.confirmPayment({
       elements: elements.value,
       confirmParams: {
         return_url: `${window.location.origin}${window.location.pathname}?payment=success`,
@@ -281,6 +335,29 @@ const handleSubmit = async () => {
 
     if (confirmError) {
       throw confirmError
+    }
+
+    // Save payment information to Supabase
+    if (paymentIntent && paymentIntent.id) {
+      try {
+        const paymentStatus = paymentIntent.status
+        await savePaymentToSupabase(paymentIntent.id, paymentStatus)
+        // Clear stored payment intent ID
+        localStorage.removeItem('influanswers-payment-intent-id')
+      } catch (err) {
+        console.error('Error saving payment information to Supabase:', err)
+        // Still proceed with success even if saving fails
+      }
+    } else if (paymentIntentId.value) {
+      // Fallback: use stored payment intent ID and assume succeeded status
+      try {
+        await savePaymentToSupabase(paymentIntentId.value, 'succeeded')
+        // Clear stored payment intent ID
+        localStorage.removeItem('influanswers-payment-intent-id')
+      } catch (err) {
+        console.error('Error saving payment information to Supabase:', err)
+        // Still proceed with success even if saving fails
+      }
     }
 
     paymentSuccess.value = true
@@ -309,8 +386,8 @@ watch([fullName, company, vatNumber, email], () => {
   })
 })
 
-// Load user info from store on mount
-onMounted(() => {
+  // Load user info from store on mount
+onMounted(async () => {
   // Load existing user info from store if available
   if (briefStore.userInfo.fullName) fullName.value = briefStore.userInfo.fullName
   if (briefStore.userInfo.company) company.value = briefStore.userInfo.company
@@ -319,8 +396,23 @@ onMounted(() => {
 
   const urlParams = new URLSearchParams(window.location.search)
   if (urlParams.get('payment') === 'success') {
-    paymentSuccess.value = true
-    emit('success')
+    // Handle payment success redirect
+    const storedPaymentIntentId = localStorage.getItem('influanswers-payment-intent-id')
+    if (storedPaymentIntentId) {
+      try {
+        // Save payment information with succeeded status
+        await savePaymentToSupabase(storedPaymentIntentId, 'succeeded')
+        // Clear stored payment intent ID
+        localStorage.removeItem('influanswers-payment-intent-id')
+      } catch (err) {
+        console.error('Error saving payment information after redirect:', err)
+        // Continue to confirmation page even if saving fails
+      }
+    }
+    // Clear the brief store after successful payment
+    briefStore.reset()
+    // Navigate to payment confirmation page
+    router.push('/payment-confirmation')
   } else {
     initializePayment()
   }
@@ -352,6 +444,12 @@ watch(
     }
   }
 )
+
+// Expose handleSubmit and isPaymentReady so parent can trigger payment and check validation
+defineExpose({
+  handleSubmit,
+  isPaymentReady,
+})
 </script>
 
 

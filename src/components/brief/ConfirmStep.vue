@@ -204,6 +204,7 @@
 
         <article class="summary-card payment-card" v-if="totalPrice > 0">
           <PaymentForm
+            ref="paymentFormRef"
             :amount="depositAmount"
             :metadata="paymentMetadata"
             @success="handlePaymentSuccess"
@@ -216,7 +217,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import Tag from 'primevue/tag'
 import { useBriefStore } from '@/stores/brief'
 import { getCountryName } from '@/lib/countries'
@@ -227,7 +229,14 @@ import { getContentFormatLabel } from '@/lib/content-formats'
 import { getCategoryLabel } from '@/lib/categories'
 import PaymentForm from './PaymentForm.vue'
 
+const router = useRouter()
 const briefStore = useBriefStore()
+const paymentFormRef = ref<InstanceType<typeof PaymentForm> | null>(null)
+
+// Expose payment form ref so parent can trigger payment
+defineExpose({
+  paymentFormRef,
+})
 
 const numberOfQuestions = computed(() => {
   return briefStore.questions.filter((q) => q?.trim().length > 0).length
@@ -252,9 +261,10 @@ const paymentMetadata = computed(() => {
 })
 
 const handlePaymentSuccess = () => {
-  // Handle successful payment
-  console.log('Payment successful!')
-  // You can emit an event or update state here
+  // Clear the brief store after successful payment
+  briefStore.reset()
+  // Navigate to payment confirmation page
+  router.push('/payment-confirmation')
 }
 
 const handlePaymentError = (error: string) => {
