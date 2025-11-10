@@ -17,11 +17,63 @@
   </div>
 
   <template v-else>
+    <div class="payment-fields">
+      <div class="field">
+        <label for="fullName" class="field-label">Full name</label>
+        <InputText
+          id="fullName"
+          v-model="fullName"
+          placeholder="John Doe"
+          class="field-input"
+          :class="{ 'p-invalid': errors.fullName }"
+        />
+        <small v-if="errors.fullName" class="field-error">{{ errors.fullName }}</small>
+      </div>
+
+      <div class="field">
+        <label for="company" class="field-label">Company</label>
+        <InputText
+          id="company"
+          v-model="company"
+          placeholder="Acme Inc."
+          class="field-input"
+          :class="{ 'p-invalid': errors.company }"
+        />
+        <small v-if="errors.company" class="field-error">{{ errors.company }}</small>
+      </div>
+
+      <div class="field">
+        <label for="vatNumber" class="field-label">
+          VAT #
+          <span class="field-label-optional">(optional)</span>
+        </label>
+        <InputText
+          id="vatNumber"
+          v-model="vatNumber"
+          placeholder="VAT123456789"
+          class="field-input"
+        />
+      </div>
+
+      <div class="field">
+        <label for="email" class="field-label">Professional email</label>
+        <InputText
+          id="email"
+          v-model="email"
+          type="email"
+          placeholder="john.doe@company.com"
+          class="field-input"
+          :class="{ 'p-invalid': errors.email }"
+        />
+        <small v-if="errors.email" class="field-error">{{ errors.email }}</small>
+      </div>
+    </div>
+
     <div ref="paymentElementRef" class="payment-element-container"></div>
     <Button
       :label="`Pay $${totalPrice.toLocaleString()}`"
       :loading="processing"
-      :disabled="processing || !stripe || !elements"
+      :disabled="processing || !stripe || !elements || !isFormValid"
       class="payment-button"
       @click="handleSubmit"
     />
@@ -32,6 +84,7 @@
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { loadStripe, type Stripe, type StripeElements } from '@stripe/stripe-js'
 import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
 import { supabase } from '@/lib/supabase'
 
 const props = defineProps<{
@@ -53,7 +106,52 @@ const error = ref<string | null>(null)
 const paymentSuccess = ref(false)
 const clientSecret = ref<string | null>(null)
 
+// Form fields
+const fullName = ref('')
+const company = ref('')
+const vatNumber = ref('')
+const email = ref('')
+const errors = ref<{
+  fullName?: string
+  company?: string
+  email?: string
+}>({})
+
 const totalPrice = computed(() => props.amount)
+
+// Email validation regex
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+// Validate form
+const validateForm = () => {
+  errors.value = {}
+
+  if (!fullName.value.trim()) {
+    errors.value.fullName = 'Full name is required'
+  }
+
+  if (!company.value.trim()) {
+    errors.value.company = 'Company is required'
+  }
+
+  if (!email.value.trim()) {
+    errors.value.email = 'Email is required'
+  } else if (!emailRegex.test(email.value)) {
+    errors.value.email = 'Please enter a valid email address'
+  }
+
+  return Object.keys(errors.value).length === 0
+}
+
+// Check if form is valid
+const isFormValid = computed(() => {
+  return (
+    fullName.value.trim() !== '' &&
+    company.value.trim() !== '' &&
+    email.value.trim() !== '' &&
+    emailRegex.test(email.value)
+  )
+})
 
 const initializePayment = async () => {
   try {
@@ -81,7 +179,13 @@ const initializePayment = async () => {
       body: {
         amount: props.amount,
         currency: 'usd',
-        metadata: props.metadata || {},
+        metadata: {
+          ...props.metadata,
+          customer_name: fullName.value || '',
+          customer_company: company.value || '',
+          customer_vat: vatNumber.value || '',
+          customer_email: email.value || '',
+        },
       },
     })
 
@@ -141,6 +245,11 @@ const handleSubmit = async () => {
     return
   }
 
+  // Validate form before submitting
+  if (!validateForm()) {
+    return
+  }
+
   try {
     processing.value = true
     error.value = null
@@ -149,6 +258,12 @@ const handleSubmit = async () => {
       elements: elements.value,
       confirmParams: {
         return_url: `${window.location.origin}${window.location.pathname}?payment=success`,
+        payment_method_data: {
+          billing_details: {
+            name: fullName.value,
+            email: email.value,
+          },
+        },
       },
       redirect: 'if_required',
     })
@@ -238,6 +353,58 @@ watch(
 
 .payment-error {
   color: #ef4444;
+}
+
+.payment-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a202c;
+}
+
+.field-label-optional {
+  font-weight: 400;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.field-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1f2937;
+  transition: border-color 0.2s ease;
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: #6348ed;
+  box-shadow: 0 0 0 3px rgba(99, 72, 237, 0.1);
+}
+
+.field-input.p-invalid {
+  border-color: #ef4444;
+}
+
+.field-error {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: -4px;
 }
 
 .payment-element-container {
