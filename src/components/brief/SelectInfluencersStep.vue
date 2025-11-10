@@ -38,6 +38,8 @@
           display="chip"
           :modelValue="briefStore.selection.platforms"
           :options="platformOptions"
+          optionLabel="label"
+          optionValue="value"
           filter
           placeholder="Select platforms"
           @update:modelValue="briefStore.updateSelectionField('platforms', $event ?? [])"
@@ -86,6 +88,8 @@
           id="audience-size"
           :modelValue="briefStore.selection.audienceSize"
           :options="audienceSizeOptions"
+          optionLabel="label"
+          optionValue="value"
           placeholder="Select an audience tier"
           @update:modelValue="briefStore.updateSelectionField('audienceSize', $event ?? '')"
         />
@@ -98,6 +102,8 @@
           display="chip"
           :modelValue="briefStore.selection.gender"
           :options="genderOptions"
+          optionLabel="label"
+          optionValue="value"
           filter
           placeholder="Select gender"
           @update:modelValue="briefStore.updateSelectionField('gender', $event ?? [])"
@@ -111,6 +117,8 @@
           display="chip"
           :modelValue="briefStore.selection.contentFormat"
           :options="contentFormatOptions"
+          optionLabel="label"
+          optionValue="value"
           filter
           placeholder="Select content format"
           @update:modelValue="briefStore.updateSelectionField('contentFormat', $event ?? [])"
@@ -159,21 +167,12 @@ import Slider from 'primevue/slider'
 import Textarea from 'primevue/textarea'
 import { useBriefStore } from '@/stores/brief'
 import { countryOptions } from '@/lib/countries'
+import { audienceSizeOptions } from '@/lib/audience-sizes'
+import { genderOptions } from '@/lib/genders'
+import { platformOptions } from '@/lib/platforms'
+import { contentFormatOptions } from '@/lib/content-formats'
 
 const briefStore = useBriefStore()
-
-const platformOptions = [
-  'Instagram',
-  'TikTok',
-  'YouTube',
-  'LinkedIn',
-  'Twitter',
-  'Twitch',
-  'Red',
-  'Facebook',
-  'WeChat',
-  'Douyin',
-]
 
 const groupedCategories = [
   {
@@ -271,17 +270,6 @@ const groupedCategories = [
     ],
   },
 ]
-
-const audienceSizeOptions = [
-  'KOC (0-1k)',
-  'Nano (1k – 10k)',
-  'Micro (10k – 50k)',
-  'Mid-tier (50k – 100k)',
-]
-
-const genderOptions = ['Male', 'Female', 'Other']
-
-const contentFormatOptions = ['Video', 'Reels', 'Photos', 'Live streams', 'Blog', 'Podcast']
 
 const numberOfInfluencersValue = computed({
   get: () => briefStore.selection.numberOfInfluencers,

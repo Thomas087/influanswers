@@ -61,7 +61,7 @@
                   <Tag
                     v-for="platform in briefStore.selection.platforms"
                     :key="platform"
-                    :value="platform"
+                    :value="getPlatformLabel(platform)"
                     class="summary-tag"
                   />
                 </template>
@@ -100,7 +100,7 @@
             </div>
             <div>
               <dt>Audience size</dt>
-              <dd>{{ briefStore.selection.audienceSize || '—' }}</dd>
+              <dd>{{ briefStore.selection.audienceSize ? getAudienceSizeLabel(briefStore.selection.audienceSize) : '—' }}</dd>
             </div>
             <div>
               <dt>Gender</dt>
@@ -109,7 +109,7 @@
                   <Tag
                     v-for="gender in briefStore.selection.gender"
                     :key="gender"
-                    :value="gender"
+                    :value="getGenderLabel(gender)"
                     severity="warning"
                     class="summary-tag"
                   />
@@ -124,7 +124,7 @@
                   <Tag
                     v-for="format in briefStore.selection.contentFormat"
                     :key="format"
-                    :value="format"
+                    :value="getContentFormatLabel(format)"
                     severity="help"
                     class="summary-tag"
                   />
@@ -171,6 +171,10 @@
 import Tag from 'primevue/tag'
 import { useBriefStore } from '@/stores/brief'
 import { getCountryName } from '@/lib/countries'
+import { getAudienceSizeLabel } from '@/lib/audience-sizes'
+import { getGenderLabel } from '@/lib/genders'
+import { getPlatformLabel } from '@/lib/platforms'
+import { getContentFormatLabel } from '@/lib/content-formats'
 
 const briefStore = useBriefStore()
 </script>
