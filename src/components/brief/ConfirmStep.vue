@@ -197,6 +197,15 @@
             </div>
           </div>
         </article>
+
+        <article class="summary-card payment-card" v-if="totalPrice > 0">
+          <PaymentForm
+            :amount="totalPrice"
+            :metadata="paymentMetadata"
+            @success="handlePaymentSuccess"
+            @error="handlePaymentError"
+          />
+        </article>
       </div>
     </div>
   </section>
@@ -212,6 +221,7 @@ import { getGenderLabel } from '@/lib/genders'
 import { getPlatformLabel } from '@/lib/platforms'
 import { getContentFormatLabel } from '@/lib/content-formats'
 import { getCategoryLabel } from '@/lib/categories'
+import PaymentForm from './PaymentForm.vue'
 
 const briefStore = useBriefStore()
 
@@ -226,6 +236,26 @@ const numberOfInfluencers = computed(() => {
 const totalPrice = computed(() => {
   return numberOfInfluencers.value * numberOfQuestions.value * 25
 })
+
+const paymentMetadata = computed(() => {
+  return {
+    project_name: briefStore.brief.projectName || 'Untitled Project',
+    number_of_influencers: numberOfInfluencers.value.toString(),
+    number_of_questions: numberOfQuestions.value.toString(),
+  }
+})
+
+const handlePaymentSuccess = () => {
+  // Handle successful payment
+  console.log('Payment successful!')
+  // You can emit an event or update state here
+}
+
+const handlePaymentError = (error: string) => {
+  // Handle payment error
+  console.error('Payment error:', error)
+  // You can show a toast notification here
+}
 </script>
 
 <style scoped>
@@ -360,8 +390,11 @@ const totalPrice = computed(() => {
 }
 
 .pricing-card {
-  position: sticky;
   top: 24px;
+}
+
+.payment-card {
+  margin-top: 24px;
 }
 
 .pricing-breakdown {

@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@primeuix/themes": "^1.2.5",
+    "@stripe/stripe-js": "^8.3.0",
     "@supabase/supabase-js": "^2.80.0",
     "pinia": "^3.0.3",
     "primeicons": "^7.0.0",
