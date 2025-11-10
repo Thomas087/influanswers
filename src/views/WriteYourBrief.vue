@@ -57,23 +57,11 @@
                   <!-- Show both buttons when other steps have content -->
                   <div class="step-footer-buttons">
                     <Button
-                      label="Next"
-                      icon="pi pi-arrow-right"
-                      icon-pos="right"
-                      severity="secondary"
-                      outlined
-                      :disabled="step.isDisabled?.() ?? false"
-                      @click="
-                        () => {
-                          if (activeStep < steps.length) activeStep++
-                        }
-                      "
-                    />
-                    <Button
                       :label="isProcessingChatGPT ? currentLoadingMessage : step.nextLabel"
                       :icon="step.nextIcon"
                       :icon-pos="step.nextIconPos"
-                      :severity="step.nextSeverity"
+                      severity="secondary"
+                      outlined
                       :loading="isProcessingChatGPT"
                       :disabled="(step.isDisabled?.() ?? false) || isProcessingChatGPT"
                       @click="
@@ -84,6 +72,17 @@
                           } catch (error) {
                             // Error already handled in handleChatGPTRequest
                           }
+                        }
+                      "
+                    />
+                    <Button
+                      label="Continue"
+                      icon="pi pi-arrow-right"
+                      icon-pos="right"
+                      :disabled="step.isDisabled?.() ?? false"
+                      @click="
+                        () => {
+                          if (activeStep < steps.length) activeStep++
                         }
                       "
                     />
