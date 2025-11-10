@@ -6,7 +6,7 @@
     <div class="fixed-top-header">
       <div class="top-header-content">
         <nav class="breadcrumbs">
-          <button class="breadcrumb-item" @click="router.push('/')">Home</button>
+          <button class="breadcrumb-item" @click="router.push('/')">Influanswers</button>
           <span class="breadcrumb-separator">/</span>
           <span class="breadcrumb-item breadcrumb-item--current">
             {{ currentStep?.label || 'Write your brief' }}
@@ -59,13 +59,7 @@
               <WriteBriefStep v-if="step.value === 1" />
               <QuestionsStep v-else-if="step.value === 2" />
               <SelectInfluencersStep v-else-if="step.value === 3" />
-              <ConfirmStep v-else-if="step.value === 4">
-                <template #actions>
-                  <div class="logistics-actions">
-                    <p>{{ step.slot }}</p>
-                  </div>
-                </template>
-              </ConfirmStep>
+              <ConfirmStep v-else-if="step.value === 4" />
             </StepPanel>
           </StepPanels>
         </Stepper>
