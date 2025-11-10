@@ -296,7 +296,7 @@ const handleChatGPTRequest = async () => {
         if (Array.isArray(briefData.selection.regions)) {
           briefStore.updateSelectionField('regions', briefData.selection.regions)
         }
-        if (briefData.selection.audienceSize) {
+        if (Array.isArray(briefData.selection.audienceSize)) {
           briefStore.updateSelectionField('audienceSize', briefData.selection.audienceSize)
         }
         if (Array.isArray(briefData.selection.gender)) {

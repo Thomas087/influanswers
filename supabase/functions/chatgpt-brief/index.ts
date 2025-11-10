@@ -340,9 +340,12 @@ const BRIEF_RESPONSE_SCHEMA = {
           description: 'List of target countries (ISO 3166-1 alpha-2 codes)',
         },
         audienceSize: {
-          type: 'string',
-          enum: ['koc', 'nano', 'micro', 'mid-tier', ''],
-          description: 'Target audience size tier (empty string if not specified)',
+          type: 'array',
+          items: {
+            type: 'string',
+            enum: ['koc', 'nano', 'micro', 'mid-tier'],
+          },
+          description: 'Target audience size tiers (can be empty array if not specified)',
         },
         gender: {
           type: 'array',
@@ -431,7 +434,7 @@ Based on the following client-provided brand brief, generate:
    - Relevant platforms (select from the valid enum values)
    - Relevant categories/niches (select from the valid enum values)
    - Target regions/countries (use ISO 3166-1 alpha-2 country codes)
-   - Audience size tier if applicable
+   - Audience size tiers if applicable (can select multiple)
    - Gender demographics if relevant
    - Content formats that would work best
    - Any previous collaborations or products to mention
@@ -442,7 +445,7 @@ CRITICAL:
 - The "briefSummary" field should be a NEW 2-3 sentence summary you generate based on the client brief
 - You MUST only use values from the provided enums for platforms, categories, regions, audienceSize, gender, and contentFormat
 - For regions, use ISO 3166-1 alpha-2 country codes (e.g., "US", "FR", "GB")
-- For optional fields: use empty string "" for audienceSize if not applicable, and empty string "" for additionalNotes if there are no notes
+- For optional fields: use empty array [] for audienceSize if not applicable, and empty string "" for additionalNotes if there are no notes
 - Select categories that are most relevant to the brand
 - Be strategic in your recommendations based on the brand brief
 
@@ -469,7 +472,7 @@ You must respond with a single JSON object (NOT an array) with this exact struct
     "platforms": ["instagram", "tiktok"],  // array of strings from valid enum values
     "categories": ["beauty-cosmetics", "fashion-luxury"],  // array of strings from valid enum values
     "regions": ["US", "FR"],  // array of ISO 3166-1 alpha-2 country codes
-    "audienceSize": "mid-tier",  // string: "koc", "nano", "micro", "mid-tier", or "" if not applicable
+    "audienceSize": ["mid-tier"],  // array of strings: "koc", "nano", "micro", "mid-tier" (can be empty array [])
     "gender": ["male", "female"],  // array of strings: "male", "female", "other"
     "contentFormat": ["video", "photos"],  // array of strings from valid enum values
     "previousCollaborations": ["string"],  // array of strings (can be empty)
@@ -481,7 +484,7 @@ IMPORTANT:
 - Return ONLY the JSON object, no markdown, no code blocks, no explanations
 - The root must be an object with "brief" and "selection" keys
 - All arrays must be arrays (even if empty), not null
-- Use empty string "" for optional fields (audienceSize, additionalNotes) if not applicable
+- Use empty array [] for optional audienceSize if not applicable, and empty string "" for additionalNotes if not applicable
 - questions must be EXACTLY 5 items
 - All enum values must match exactly (lowercase, with hyphens where specified)`
 
@@ -825,11 +828,12 @@ IMPORTANT:
           'gender',
           'contentFormat',
           'previousCollaborations',
+          'audienceSize',
         ].includes(field)
       ) {
         return !Array.isArray(value)
       }
-      if (['audienceSize', 'additionalNotes'].includes(field)) {
+      if (field === 'additionalNotes') {
         return typeof value !== 'string' && value !== null
       }
       return value === undefined
@@ -858,7 +862,7 @@ IMPORTANT:
       (!selection.platforms || selection.platforms.length === 0) &&
       (!selection.categories || selection.categories.length === 0) &&
       (!selection.regions || selection.regions.length === 0) &&
-      (!selection.audienceSize || selection.audienceSize === '') &&
+      (!selection.audienceSize || selection.audienceSize.length === 0) &&
       (!selection.gender || selection.gender.length === 0) &&
       (!selection.contentFormat || selection.contentFormat.length === 0)
     ) {
@@ -915,10 +919,10 @@ IMPORTANT:
     if (!Array.isArray(briefData.selection.previousCollaborations)) {
       briefData.selection.previousCollaborations = []
     }
-    // Normalize empty strings to null/undefined for optional fields
-    if (briefData.selection.audienceSize === '') {
-      briefData.selection.audienceSize = null
+    if (!Array.isArray(briefData.selection.audienceSize)) {
+      briefData.selection.audienceSize = []
     }
+    // Normalize empty strings to null/undefined for optional fields
     if (briefData.selection.additionalNotes === '') {
       briefData.selection.additionalNotes = null
     }

@@ -100,7 +100,18 @@
             </div>
             <div>
               <dt>Audience size</dt>
-              <dd>{{ briefStore.selection.audienceSize ? getAudienceSizeLabel(briefStore.selection.audienceSize) : '—' }}</dd>
+              <dd>
+                <template v-if="briefStore.selection.audienceSize.length">
+                  <Tag
+                    v-for="size in briefStore.selection.audienceSize"
+                    :key="size"
+                    :value="getAudienceSizeLabel(size)"
+                    severity="success"
+                    class="summary-tag"
+                  />
+                </template>
+                <span v-else>—</span>
+              </dd>
             </div>
             <div>
               <dt>Gender</dt>

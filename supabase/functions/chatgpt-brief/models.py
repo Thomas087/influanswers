@@ -332,9 +332,9 @@ class InfluencerSelection(BaseModel):
         default_factory=list,
         description="List of target countries (ISO 3166-1 alpha-2 codes)"
     )
-    audienceSize: Optional[AudienceSize] = Field(
-        None,
-        description="Target audience size tier"
+    audienceSize: List[AudienceSize] = Field(
+        default_factory=list,
+        description="Target audience size tiers (can be empty list if not specified)"
     )
     gender: List[Gender] = Field(
         default_factory=list,

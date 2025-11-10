@@ -86,14 +86,16 @@
 
       <div class="form-field">
         <label class="field-label" for="audience-size">Audience size</label>
-        <Dropdown
+        <MultiSelect
           id="audience-size"
+          display="chip"
           :modelValue="briefStore.selection.audienceSize"
           :options="audienceSizeOptions"
           optionLabel="label"
           optionValue="value"
-          placeholder="Select an audience tier"
-          @update:modelValue="briefStore.updateSelectionField('audienceSize', $event ?? '')"
+          filter
+          placeholder="Select audience tiers"
+          @update:modelValue="briefStore.updateSelectionField('audienceSize', $event ?? [])"
         />
       </div>
 
@@ -161,7 +163,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import AutoComplete from 'primevue/autocomplete'
-import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
 import Message from 'primevue/message'
 import MultiSelect from 'primevue/multiselect'

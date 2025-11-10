@@ -10,7 +10,7 @@ export interface InfluencerSelection {
   platforms: string[]
   categories: string[]
   regions: string[]
-  audienceSize: string
+  audienceSize: string[]
   gender: string[]
   contentFormat: string[]
   previousCollaborations: string[]
@@ -35,7 +35,7 @@ export const createDefaultBrief = (): Brief => ({
     platforms: [],
     categories: [],
     regions: [],
-    audienceSize: '',
+    audienceSize: [],
     gender: [],
     contentFormat: [],
     previousCollaborations: [],
