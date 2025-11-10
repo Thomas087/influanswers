@@ -75,7 +75,7 @@
                   <Tag
                     v-for="category in briefStore.selection.categories"
                     :key="category"
-                    :value="category"
+                    :value="getCategoryLabel(category)"
                     severity="secondary"
                     class="summary-tag"
                   />
@@ -175,6 +175,7 @@ import { getAudienceSizeLabel } from '@/lib/audience-sizes'
 import { getGenderLabel } from '@/lib/genders'
 import { getPlatformLabel } from '@/lib/platforms'
 import { getContentFormatLabel } from '@/lib/content-formats'
+import { getCategoryLabel } from '@/lib/categories'
 
 const briefStore = useBriefStore()
 </script>

@@ -55,6 +55,8 @@
           filter
           optionGroupLabel="label"
           optionGroupChildren="items"
+          optionLabel="label"
+          optionValue="value"
           display="chip"
           placeholder="Select categories"
           class="w-full"
@@ -171,105 +173,9 @@ import { audienceSizeOptions } from '@/lib/audience-sizes'
 import { genderOptions } from '@/lib/genders'
 import { platformOptions } from '@/lib/platforms'
 import { contentFormatOptions } from '@/lib/content-formats'
+import { groupedCategories } from '@/lib/categories'
 
 const briefStore = useBriefStore()
-
-const groupedCategories = [
-  {
-    label: 'Core lifestyle & personal interests',
-    items: [
-      'Beauty & Cosmetics',
-      'Fashion & Luxury',
-      'Lifestyle',
-      'Health & Wellness',
-      'Fitness & Sports',
-      'Nutrition & Diet',
-      'Mental Health',
-      'Parenting & Family',
-      'Relationships & Dating',
-      'Self-Improvement & Motivation',
-    ],
-  },
-  {
-    label: 'Entertainment & culture',
-    items: [
-      'Gaming',
-      'Movies & TV',
-      'Music',
-      'Art & Design',
-      'Photography',
-      'Books & Literature',
-      'Pop Culture',
-      'Celebrities & Influencers',
-    ],
-  },
-  {
-    label: 'Travel & experiences',
-    items: ['Travel', 'Adventure & Outdoors', 'Hospitality & Tourism', 'Sustainable Travel'],
-  },
-  {
-    label: 'Technology & innovation',
-    items: [
-      'Tech & Gadgets',
-      'AI & Innovation',
-      'Science & Education',
-      'Automotive',
-      'Cryptocurrency & Blockchain',
-      'Finance & Investing',
-      'Startups & Entrepreneurship',
-    ],
-  },
-  {
-    label: 'Food & drink',
-    items: [
-      'Food & Beverage',
-      'Cooking & Recipes',
-      'Wine, Beer & Spirits',
-      'Restaurants & Dining',
-      'Vegan & Plant-Based Living',
-    ],
-  },
-  {
-    label: 'Home & lifestyle',
-    items: [
-      'Home Decor & Interior Design',
-      'DIY & Crafts',
-      'Gardening',
-      'Pets & Animals',
-      'Real Estate',
-    ],
-  },
-  {
-    label: 'Social & environmental topics',
-    items: [
-      'Sustainability & Environment',
-      'Charity & Social Causes',
-      'Politics & Activism',
-      'Education & Learning',
-    ],
-  },
-  {
-    label: 'Professional & business',
-    items: [
-      'Career & Productivity',
-      'Marketing & Advertising',
-      'E-Commerce & Retail',
-      'Events & Conferences',
-    ],
-  },
-  {
-    label: 'Other niches',
-    items: [
-      'Luxury Lifestyle',
-      'Weddings & Events',
-      'Spirituality & Mindfulness',
-      "Men's Lifestyle",
-      "Women's Lifestyle",
-      'Youth & Student Life',
-      'Other',
-    ],
-  },
-]
 
 const numberOfInfluencersValue = computed({
   get: () => briefStore.selection.numberOfInfluencers,
