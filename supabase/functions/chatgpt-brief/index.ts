@@ -17,7 +17,7 @@ const BRIEF_RESPONSE_SCHEMA = {
         },
         brandBrief: {
           type: 'string',
-          description: 'The full brand brief content',
+          description: 'The exact client-provided brand brief (copy verbatim, do not modify)',
         },
         briefSummary: {
           type: 'string',
@@ -422,13 +422,12 @@ Deno.serve(async (req) => {
     - A set of questions that will be asked to influencers in order to answer a brand brief
     - A set of selection criteria to find relevant influencers to answer these questions
 
-Based on the following brand summary, generate a comprehensive brief with:
+Based on the following client-provided brand brief, generate:
 1. A concise project name
-2. An expanded and detailed brand brief
-3. A brief summary (2-3 sentences)
-4. Exactly 5 key questions to be asked to the influencers in order to answer the brief requests
-5. Recommended influencer selection criteria including:
-   - Number of influencers (between 10-500)
+2. A brief summary (2-3 sentences) that summarizes the project
+3. Exactly 5 key questions to be asked to the influencers in order to answer the brief requests
+4. Recommended influencer selection criteria including:
+   - Number of influencers: Use 10 as the default unless the client brief explicitly specifies a different number (must be between 10-500)
    - Relevant platforms (select from the valid enum values)
    - Relevant categories/niches (select from the valid enum values)
    - Target regions/countries (use ISO 3166-1 alpha-2 country codes)
@@ -438,14 +437,16 @@ Based on the following brand summary, generate a comprehensive brief with:
    - Any previous collaborations or products to mention
    - Additional notes
 
-IMPORTANT: 
+CRITICAL: 
+- The "brandBrief" field in your response MUST contain the EXACT client-provided brand brief below (copy it verbatim, do not modify or expand it)
+- The "briefSummary" field should be a NEW 2-3 sentence summary you generate based on the client brief
 - You MUST only use values from the provided enums for platforms, categories, regions, audienceSize, gender, and contentFormat
 - For regions, use ISO 3166-1 alpha-2 country codes (e.g., "US", "FR", "GB")
 - For optional fields: use empty string "" for audienceSize if not applicable, and empty string "" for additionalNotes if there are no notes
 - Select categories that are most relevant to the brand
-- Be strategic in your recommendations based on the brand summary
+- Be strategic in your recommendations based on the brand brief
 
-Brand Summary:
+Client-Provided Brand Brief (copy this EXACTLY into the "brandBrief" field):
 ${brandSummary}`
 
     // Build the full input with explicit format instructions
@@ -459,12 +460,12 @@ You must respond with a single JSON object (NOT an array) with this exact struct
 {
   "brief": {
     "projectName": "string - A concise, descriptive project name",
-    "brandBrief": "string - The full brand brief content",
-    "briefSummary": "string - A brief summary (2-3 sentences)",
+    "brandBrief": "string - Copy the EXACT client-provided brand brief verbatim (do not modify or expand it)",
+    "briefSummary": "string - A NEW brief summary (2-3 sentences) that you generate based on the client brief",
     "questions": ["string", "string", "string", "string", "string"]  // EXACTLY 5 questions
   },
   "selection": {
-    "numberOfInfluencers": 50,  // integer between 10-500
+    "numberOfInfluencers": 10,  // integer between 10-500 (default to 10 unless client brief specifies otherwise)
     "platforms": ["instagram", "tiktok"],  // array of strings from valid enum values
     "categories": ["beauty-cosmetics", "fashion-luxury"],  // array of strings from valid enum values
     "regions": ["US", "FR"],  // array of ISO 3166-1 alpha-2 country codes
@@ -875,6 +876,24 @@ IMPORTANT:
           },
         },
       )
+    }
+
+    // Ensure the original client input is preserved in brandBrief (don't let AI modify it)
+    briefData.brief.brandBrief = brandSummary
+
+    // Default numberOfInfluencers to 10 unless client brief explicitly specifies a number
+    // Check if the client brief mentions a specific number of influencers
+    const influencerCountMatch = brandSummary.match(
+      /\b(\d+)\s*(?:influencers?|creators?|content\s*creators?|partners?)\b/i,
+    )
+    const specifiedCount = influencerCountMatch ? parseInt(influencerCountMatch[1], 10) : null
+
+    if (specifiedCount && specifiedCount >= 10 && specifiedCount <= 500) {
+      // Use the number specified in the client brief
+      briefData.selection.numberOfInfluencers = specifiedCount
+    } else {
+      // Default to 10 if no valid number is specified
+      briefData.selection.numberOfInfluencers = 10
     }
 
     // Ensure arrays are initialized and normalize optional fields
