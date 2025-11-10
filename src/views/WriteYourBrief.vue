@@ -70,7 +70,7 @@
                       "
                     />
                     <Button
-                      :label="step.nextLabel"
+                      :label="isProcessingChatGPT ? currentLoadingMessage : step.nextLabel"
                       :icon="step.nextIcon"
                       :icon-pos="step.nextIconPos"
                       :severity="step.nextSeverity"
@@ -91,7 +91,9 @@
                 </template>
                 <Button
                   v-else
-                  :label="step.nextLabel"
+                  :label="
+                    step.value === 1 && isProcessingChatGPT ? currentLoadingMessage : step.nextLabel
+                  "
                   :icon="step.nextIcon"
                   :icon-pos="step.nextIconPos"
                   :severity="step.nextSeverity"
@@ -115,7 +117,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import Button from 'primevue/button'
 import Stepper from 'primevue/stepper'
 import StepList from 'primevue/steplist'
@@ -137,6 +139,51 @@ const isSubmitting = ref(false)
 const isProcessingChatGPT = ref(false)
 const toast = useToast()
 const briefStore = useBriefStore()
+
+// Rotating loading messages
+const loadingMessages = [
+  'Analyzing instructions',
+  'Generating questions',
+  'Defining influencer selection',
+  'Finalizing brief',
+]
+const currentLoadingMessageIndex = ref(0)
+const loadingMessageInterval = ref<number | null>(null)
+
+const currentLoadingMessage = computed(() => loadingMessages[currentLoadingMessageIndex.value])
+
+// Watch for loading state changes to start/stop message rotation
+watch(isProcessingChatGPT, (isLoading) => {
+  if (isLoading) {
+    // Start rotating messages every 10 seconds (don't loop, stop at last message)
+    currentLoadingMessageIndex.value = 0
+    loadingMessageInterval.value = window.setInterval(() => {
+      if (currentLoadingMessageIndex.value < loadingMessages.length - 1) {
+        currentLoadingMessageIndex.value++
+      } else {
+        // Stop at the last message
+        if (loadingMessageInterval.value !== null) {
+          clearInterval(loadingMessageInterval.value)
+          loadingMessageInterval.value = null
+        }
+      }
+    }, 7000)
+  } else {
+    // Stop rotating messages
+    if (loadingMessageInterval.value !== null) {
+      clearInterval(loadingMessageInterval.value)
+      loadingMessageInterval.value = null
+    }
+    currentLoadingMessageIndex.value = 0
+  }
+})
+
+// Cleanup on unmount
+onUnmounted(() => {
+  if (loadingMessageInterval.value !== null) {
+    clearInterval(loadingMessageInterval.value)
+  }
+})
 
 // Check if other steps have content
 const hasOtherStepsContent = computed(() => {
