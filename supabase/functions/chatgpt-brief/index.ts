@@ -275,32 +275,31 @@ IMPORTANT:
 Brand Summary:
 ${brandSummary}`
 
-    // Call OpenAI with structured outputs
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    // Build the full input with system instructions
+    const fullInput = `You are an expert marketing strategist. Always respond with valid JSON matching the provided schema.
+
+${prompt}
+
+IMPORTANT: You must respond with valid JSON that matches this exact schema structure:
+- brief: { projectName, brandBrief, briefSummary, questions }
+- selection: { numberOfInfluencers, platforms, categories, regions, audienceSize, gender, contentFormat, previousCollaborations, additionalNotes }`
+
+    // Call OpenAI Responses API with structured outputs
+    const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are an expert marketing strategist. Always respond with valid JSON matching the provided schema.",
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        response_format: {
-          type: "json_schema",
-          json_schema: {
+        model: "gpt-4.1",
+        input: fullInput,
+        text: {
+          format: {
             name: "brief_response",
-            strict: true,
+            type: "json_schema",
             schema: BRIEF_RESPONSE_SCHEMA,
+            strict: true,
           },
         },
         temperature: 0.7,
@@ -327,13 +326,71 @@ ${brandSummary}`
     }
 
     const data = await response.json()
-    const content = data.choices[0]?.message?.content
+    
+    // Check if the response has an error
+    if (data.error) {
+      console.error("OpenAI API error in response:", data.error)
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "OpenAI API returned an error",
+          details: data.error,
+        }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      )
+    }
+    
+    // Check if the response status is completed
+    if (data.status && data.status !== "completed") {
+      console.error("OpenAI API response not completed:", data.status, data.incomplete_details)
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: `OpenAI API response status: ${data.status}`,
+          details: data.incomplete_details,
+        }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      )
+    }
+    
+    // Responses API returns content in data.output[0].content[0].text
+    // Structure: { output: [{ content: [{ type: "output_text", text: "..." }] }] }
+    let content = null
+    
+    if (data.output && Array.isArray(data.output) && data.output.length > 0) {
+      const firstOutput = data.output[0]
+      if (firstOutput.content && Array.isArray(firstOutput.content) && firstOutput.content.length > 0) {
+        const firstContent = firstOutput.content[0]
+        if (firstContent.type === "output_text" && firstContent.text) {
+          content = firstContent.text
+        }
+      }
+    }
+    
+    // Fallback to other possible structures
+    if (!content) {
+      content = data.text?.output || data.text?.content || data.output || data.content || data.choices?.[0]?.message?.content || data.text
+    }
 
     if (!content) {
+      console.error("Unexpected response structure:", JSON.stringify(data, null, 2))
       return new Response(
         JSON.stringify({
           success: false,
           error: "No content in OpenAI response",
+          details: "Unexpected response structure",
         }),
         {
           status: 500,
@@ -351,6 +408,7 @@ ${brandSummary}`
       briefData = typeof content === "string" ? JSON.parse(content) : content
     } catch (parseError) {
       console.error("Failed to parse OpenAI response:", parseError)
+      console.error("Response content:", content)
       return new Response(
         JSON.stringify({
           success: false,
