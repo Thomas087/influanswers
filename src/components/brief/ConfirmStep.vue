@@ -28,11 +28,16 @@
                 <dt>Key questions</dt>
                 <dd>
                   <template v-if="briefStore.questions.length > 0">
-                    <ul class="questions-list">
-                      <li v-for="(question, index) in briefStore.questions" :key="index">
-                        {{ question }}
-                      </li>
-                    </ul>
+                    <div class="questions-container">
+                      <div
+                        v-for="(question, index) in briefStore.questions"
+                        :key="index"
+                        class="question-item"
+                      >
+                        <span class="question-number">{{ index + 1 }}</span>
+                        <span class="question-text">{{ question }}</span>
+                      </div>
+                    </div>
                   </template>
                   <span v-else>—</span>
                 </dd>
@@ -276,25 +281,42 @@ const briefStore = useBriefStore()
   margin: 0 8px 8px 0;
 }
 
-.questions-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.questions-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
-.questions-list li {
-  position: relative;
-  padding-left: 20px;
+.question-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
 }
 
-.questions-list li::before {
-  content: '•';
-  position: absolute;
-  left: 0;
-  color: #6348ed;
+.question-number {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #6348ed;
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 12px;
   font-weight: 600;
+  line-height: 1;
+}
+
+.question-text {
+  flex: 1;
+  font-size: 15px;
+  color: #1f2937;
+  line-height: 1.45;
 }
 </style>
