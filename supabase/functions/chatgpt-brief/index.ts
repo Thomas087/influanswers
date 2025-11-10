@@ -448,14 +448,41 @@ IMPORTANT:
 Brand Summary:
 ${brandSummary}`
 
-    // Build the full input with system instructions
-    const fullInput = `You are an expert marketing strategist. Always respond with valid JSON matching the provided schema.
+    // Build the full input with explicit format instructions
+    const fullInput = `You are an expert marketing strategist. You MUST respond with valid JSON matching the provided schema.
 
 ${prompt}
 
-IMPORTANT: You must respond with valid JSON that matches this exact schema structure:
-- brief: { projectName, brandBrief, briefSummary, questions }
-- selection: { numberOfInfluencers, platforms, categories, regions, audienceSize, gender, contentFormat, previousCollaborations, additionalNotes }`
+CRITICAL OUTPUT FORMAT REQUIREMENTS:
+You must respond with a single JSON object (NOT an array) with this exact structure:
+
+{
+  "brief": {
+    "projectName": "string - A concise, descriptive project name",
+    "brandBrief": "string - The full brand brief content",
+    "briefSummary": "string - A brief summary (2-3 sentences)",
+    "questions": ["string", "string", "string", "string", "string"]  // EXACTLY 5 questions
+  },
+  "selection": {
+    "numberOfInfluencers": 50,  // integer between 10-500
+    "platforms": ["instagram", "tiktok"],  // array of strings from valid enum values
+    "categories": ["beauty-cosmetics", "fashion-luxury"],  // array of strings from valid enum values
+    "regions": ["US", "FR"],  // array of ISO 3166-1 alpha-2 country codes
+    "audienceSize": "mid-tier",  // string: "koc", "nano", "micro", "mid-tier", or "" if not applicable
+    "gender": ["male", "female"],  // array of strings: "male", "female", "other"
+    "contentFormat": ["video", "photos"],  // array of strings from valid enum values
+    "previousCollaborations": ["string"],  // array of strings (can be empty)
+    "additionalNotes": "string"  // string or "" if none
+  }
+}
+
+IMPORTANT:
+- Return ONLY the JSON object, no markdown, no code blocks, no explanations
+- The root must be an object with "brief" and "selection" keys
+- All arrays must be arrays (even if empty), not null
+- Use empty string "" for optional fields (audienceSize, additionalNotes) if not applicable
+- questions must be EXACTLY 5 items
+- All enum values must match exactly (lowercase, with hyphens where specified)`
 
     // Call OpenAI Responses API with structured outputs
     const response = await fetch('https://api.openai.com/v1/responses', {
@@ -709,6 +736,50 @@ IMPORTANT: You must respond with valid JSON that matches this exact schema struc
       )
     }
 
+    // Validate brief structure matches schema
+    const requiredBriefFields = ['projectName', 'brandBrief', 'briefSummary', 'questions']
+    const missingBriefFields = requiredBriefFields.filter(
+      (field) =>
+        !briefData.brief[field] ||
+        (field === 'questions' && !Array.isArray(briefData.brief[field])),
+    )
+    if (missingBriefFields.length > 0) {
+      console.error('Missing required brief fields:', missingBriefFields)
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Invalid brief structure',
+          details: `Missing required fields in brief: ${missingBriefFields.join(', ')}`,
+        }),
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        },
+      )
+    }
+
+    // Validate questions array has exactly 5 items
+    if (!Array.isArray(briefData.brief.questions) || briefData.brief.questions.length !== 5) {
+      console.error('Invalid questions array:', briefData.brief.questions)
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Invalid questions format',
+          details: `Questions must be an array with exactly 5 items. Received: ${briefData.brief.questions?.length || 0} items`,
+        }),
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        },
+      )
+    }
+
     if (!briefData.selection || typeof briefData.selection !== 'object') {
       console.error('Missing or invalid selection in response:', briefData)
       return new Response(
@@ -716,6 +787,59 @@ IMPORTANT: You must respond with valid JSON that matches this exact schema struc
           success: false,
           error: 'Missing or invalid selection in response',
           details: 'The response must include a valid selection object',
+        }),
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        },
+      )
+    }
+
+    // Validate selection structure matches schema
+    const requiredSelectionFields = [
+      'numberOfInfluencers',
+      'platforms',
+      'categories',
+      'regions',
+      'audienceSize',
+      'gender',
+      'contentFormat',
+      'previousCollaborations',
+      'additionalNotes',
+    ]
+    const missingSelectionFields = requiredSelectionFields.filter((field) => {
+      const value = briefData.selection[field]
+      // Check if field exists and is correct type
+      if (field === 'numberOfInfluencers') {
+        return typeof value !== 'number'
+      }
+      if (
+        [
+          'platforms',
+          'categories',
+          'regions',
+          'gender',
+          'contentFormat',
+          'previousCollaborations',
+        ].includes(field)
+      ) {
+        return !Array.isArray(value)
+      }
+      if (['audienceSize', 'additionalNotes'].includes(field)) {
+        return typeof value !== 'string' && value !== null
+      }
+      return value === undefined
+    })
+    if (missingSelectionFields.length > 0) {
+      console.error('Missing or invalid selection fields:', missingSelectionFields)
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Invalid selection structure',
+          details: `Missing or invalid fields in selection: ${missingSelectionFields.join(', ')}`,
         }),
         {
           status: 500,
