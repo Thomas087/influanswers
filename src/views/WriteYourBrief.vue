@@ -43,74 +43,81 @@
                   </div>
                 </template>
               </ConfirmStep>
-              <div class="step-footer">
-                <div v-if="!step.showBack && !step.showNextButton"></div>
-                <Button
-                  v-if="step.showBack"
-                  label="Back"
-                  icon="pi pi-arrow-left"
-                  severity="secondary"
-                  outlined
-                  @click="prevStep"
-                />
-                <template v-if="step.value === 1 && step.showNextButton">
-                  <!-- Show both buttons when other steps have content -->
-                  <div class="step-footer-buttons">
-                    <Button
-                      :label="isProcessingChatGPT ? currentLoadingMessage : step.nextLabel"
-                      :icon="step.nextIcon"
-                      :icon-pos="step.nextIconPos"
-                      severity="secondary"
-                      outlined
-                      :loading="isProcessingChatGPT"
-                      :disabled="(step.isDisabled?.() ?? false) || isProcessingChatGPT"
-                      @click="
-                        async () => {
-                          try {
-                            await handleChatGPTRequest()
-                            if (activeStep < steps.length) activeStep++
-                          } catch (error) {
-                            // Error already handled in handleChatGPTRequest
-                          }
-                        }
-                      "
-                    />
-                    <Button
-                      label="Continue"
-                      icon="pi pi-arrow-right"
-                      icon-pos="right"
-                      :disabled="step.isDisabled?.() ?? false"
-                      @click="
-                        () => {
-                          if (activeStep < steps.length) activeStep++
-                        }
-                      "
-                    />
-                  </div>
-                </template>
-                <Button
-                  v-else
-                  :label="
-                    step.value === 1 && isProcessingChatGPT ? currentLoadingMessage : step.nextLabel
-                  "
-                  :icon="step.nextIcon"
-                  :icon-pos="step.nextIconPos"
-                  :severity="step.nextSeverity"
-                  :loading="
-                    (step.isSubmit && isSubmitting) || (step.value === 1 && isProcessingChatGPT)
-                  "
-                  :disabled="
-                    (step.isDisabled?.() ?? false) ||
-                    (step.isSubmit && isSubmitting) ||
-                    (step.value === 1 && isProcessingChatGPT)
-                  "
-                  @click="() => (step.isSubmit ? submitBrief() : nextStep())"
-                />
-              </div>
             </StepPanel>
           </StepPanels>
         </Stepper>
       </section>
+    </div>
+
+    <!-- Fixed bottom action bar -->
+    <div v-if="currentStep" class="fixed-bottom-bar">
+      <div class="bottom-bar-content">
+        <Button
+          v-if="currentStep.showBack"
+          label="Back"
+          icon="pi pi-arrow-left"
+          severity="secondary"
+          outlined
+          @click="prevStep"
+        />
+        <div v-else class="bottom-bar-spacer"></div>
+        <template v-if="currentStep.value === 1 && currentStep.showNextButton">
+          <!-- Show both buttons when other steps have content -->
+          <div class="bottom-bar-buttons">
+            <Button
+              :label="isProcessingChatGPT ? currentLoadingMessage : currentStep.nextLabel"
+              :icon="currentStep.nextIcon"
+              :icon-pos="currentStep.nextIconPos"
+              severity="secondary"
+              outlined
+              :loading="isProcessingChatGPT"
+              :disabled="(currentStep.isDisabled?.() ?? false) || isProcessingChatGPT"
+              @click="
+                async () => {
+                  try {
+                    await handleChatGPTRequest()
+                    if (activeStep < steps.length) activeStep++
+                  } catch (error) {
+                    // Error already handled in handleChatGPTRequest
+                  }
+                }
+              "
+            />
+            <Button
+              label="Continue"
+              icon="pi pi-arrow-right"
+              icon-pos="right"
+              :disabled="currentStep.isDisabled?.() ?? false"
+              @click="
+                () => {
+                  if (activeStep < steps.length) activeStep++
+                }
+              "
+            />
+          </div>
+        </template>
+        <Button
+          v-else
+          :label="
+            currentStep.value === 1 && isProcessingChatGPT
+              ? currentLoadingMessage
+              : currentStep.nextLabel
+          "
+          :icon="currentStep.nextIcon"
+          :icon-pos="currentStep.nextIconPos"
+          :severity="currentStep.nextSeverity"
+          :loading="
+            (currentStep.isSubmit && isSubmitting) ||
+            (currentStep.value === 1 && isProcessingChatGPT)
+          "
+          :disabled="
+            (currentStep.isDisabled?.() ?? false) ||
+            (currentStep.isSubmit && isSubmitting) ||
+            (currentStep.value === 1 && isProcessingChatGPT)
+          "
+          @click="() => (currentStep?.isSubmit ? submitBrief() : nextStep())"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -150,6 +157,11 @@ const currentLoadingMessageIndex = ref(0)
 const loadingMessageInterval = ref<number | null>(null)
 
 const currentLoadingMessage = computed(() => loadingMessages[currentLoadingMessageIndex.value])
+
+// Get current step based on activeStep
+const currentStep = computed(
+  () => steps.value.find((step) => step.value === activeStep.value) || steps.value[0],
+)
 
 // Watch for loading state changes to start/stop message rotation
 watch(isProcessingChatGPT, (isLoading) => {
@@ -431,7 +443,8 @@ const submitBrief = async () => {
 .brief-page {
   min-height: 100vh;
   background: linear-gradient(180deg, #f8fafc 0%, #ffffff 60%);
-  padding: 64px 24px 96px;
+  padding: 64px 24px 120px;
+  padding-bottom: calc(96px + 80px); /* Extra padding for fixed bottom bar */
 }
 
 .page-shell {
@@ -482,14 +495,33 @@ const submitBrief = async () => {
   box-shadow: 0 30px 60px rgba(15, 23, 42, 0.08);
 }
 
-.step-footer {
-  margin-top: 32px;
+/* Fixed bottom action bar */
+.fixed-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08);
+  z-index: 1000;
+  padding: 16px 24px;
+}
+
+.bottom-bar-content {
+  max-width: 1100px;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 16px;
 }
 
-.step-footer-buttons {
+.bottom-bar-spacer {
+  flex: 0 0 auto;
+}
+
+.bottom-bar-buttons {
   display: flex;
   gap: 12px;
   margin-left: auto;
@@ -514,6 +546,7 @@ const submitBrief = async () => {
 @media (max-width: 640px) {
   .brief-page {
     padding: 48px 16px 72px;
+    padding-bottom: calc(72px + 80px); /* Extra padding for fixed bottom bar on mobile */
   }
 
   .page-title {
@@ -524,8 +557,27 @@ const submitBrief = async () => {
     padding: 24px 16px;
   }
 
-  .step-footer {
+  .fixed-bottom-bar {
+    padding: 12px 16px;
+  }
+
+  .bottom-bar-content {
     flex-direction: column;
+    gap: 12px;
+  }
+
+  .bottom-bar-buttons {
+    width: 100%;
+    flex-direction: column;
+    margin-left: 0;
+  }
+
+  .bottom-bar-buttons :deep(.p-button) {
+    width: 100%;
+  }
+
+  .bottom-bar-content > .p-button {
+    width: 100%;
   }
 }
 </style>
