@@ -252,20 +252,79 @@ const handleChatGPTRequest = async () => {
       throw error
     }
 
-    if (data?.success && data?.response) {
-      // Show success message with ChatGPT response
+    if (data?.success && data?.data) {
+      const briefData = data.data
+
+      // Populate brief details
+      if (briefData.brief) {
+        if (briefData.brief.projectName) {
+          briefStore.updateField('projectName', briefData.brief.projectName)
+        }
+        if (briefData.brief.brandBrief) {
+          briefStore.updateField('brandBrief', briefData.brief.brandBrief)
+        }
+        if (briefData.brief.briefSummary) {
+          briefStore.updateField('briefSummary', briefData.brief.briefSummary)
+        }
+        if (Array.isArray(briefData.brief.questions) && briefData.brief.questions.length > 0) {
+          // Ensure we have at least 3 question slots
+          const questions = [...briefData.brief.questions]
+          while (questions.length < 3) {
+            questions.push('')
+          }
+          // Update each question
+          questions.forEach((question, index) => {
+            briefStore.updateQuestion(index, question)
+          })
+        }
+      }
+
+      // Populate influencer selection
+      if (briefData.selection) {
+        if (typeof briefData.selection.numberOfInfluencers === 'number') {
+          briefStore.updateSelectionField(
+            'numberOfInfluencers',
+            briefData.selection.numberOfInfluencers,
+          )
+        }
+        if (Array.isArray(briefData.selection.platforms)) {
+          briefStore.updateSelectionField('platforms', briefData.selection.platforms)
+        }
+        if (Array.isArray(briefData.selection.categories)) {
+          briefStore.updateSelectionField('categories', briefData.selection.categories)
+        }
+        if (Array.isArray(briefData.selection.regions)) {
+          briefStore.updateSelectionField('regions', briefData.selection.regions)
+        }
+        if (briefData.selection.audienceSize) {
+          briefStore.updateSelectionField('audienceSize', briefData.selection.audienceSize)
+        }
+        if (Array.isArray(briefData.selection.gender)) {
+          briefStore.updateSelectionField('gender', briefData.selection.gender)
+        }
+        if (Array.isArray(briefData.selection.contentFormat)) {
+          briefStore.updateSelectionField('contentFormat', briefData.selection.contentFormat)
+        }
+        if (Array.isArray(briefData.selection.previousCollaborations)) {
+          briefStore.updateSelectionField(
+            'previousCollaborations',
+            briefData.selection.previousCollaborations,
+          )
+        }
+        if (briefData.selection.additionalNotes) {
+          briefStore.updateSelectionField('additionalNotes', briefData.selection.additionalNotes)
+        }
+      }
+
+      // Show success message
       toast.add({
         severity: 'success',
         summary: 'Brief analyzed',
-        detail: 'ChatGPT has analyzed your brief. Check the console for detailed suggestions.',
+        detail: 'ChatGPT has analyzed your brief and filled in the relevant fields.',
         life: 5000,
       })
 
-      // Log the full response for now (you can enhance this to display it in the UI)
-      console.log('ChatGPT Analysis:', data.response)
-
-      // Optionally, you could pre-fill some fields based on the response
-      // For example, extract key objectives or questions suggestions
+      console.log('ChatGPT Analysis completed. Brief store updated:', briefData)
     } else {
       throw new Error(data?.error || 'Failed to get response from ChatGPT')
     }
