@@ -468,11 +468,10 @@ const countryOptions = [
 ]
 
 const audienceSizeOptions = [
+  'KOC (0-1k)',
   'Nano (1k – 10k)',
-  'Micro (10k – 100k)',
-  'Mid-tier (100k – 500k)',
-  'Macro (500k – 1M)',
-  'Mega (1M+)',
+  'Micro (10k – 50k)',
+  'Mid-tier (50k – 100k)',
 ]
 
 const genderOptions = ['Male', 'Female', 'Other']
