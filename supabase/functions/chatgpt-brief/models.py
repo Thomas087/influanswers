@@ -306,9 +306,9 @@ class BriefDetails(BaseModel):
     briefSummary: str = Field(..., description="A brief summary of the project")
     questions: List[str] = Field(
         ...,
-        min_length=3,
-        max_length=10,
-        description="List of key questions (minimum 3, maximum 10)"
+        min_length=5,
+        max_length=5,
+        description="List of exactly 5 key questions to be asked to influencers"
     )
 
 

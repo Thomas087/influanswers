@@ -46,7 +46,7 @@ export const useBriefStore = defineStore('brief', () => {
   const isQuestionsValid = computed(() => {
     if (!questions.value) return false
     const validQuestions = questions.value.filter((q) => q?.trim().length > 0)
-    return validQuestions.length >= 3
+    return validQuestions.length >= 3 && validQuestions.length <= 20
   })
 
   const isSelectionValid = computed(
@@ -90,8 +90,11 @@ export const useBriefStore = defineStore('brief', () => {
 
   function addQuestion() {
     ensureQuestionsArray()
-    state.value.brief.questions.push('')
-    saveToStorage(state.value)
+    // Allow up to 20 questions
+    if (state.value.brief.questions.length < 20) {
+      state.value.brief.questions.push('')
+      saveToStorage(state.value)
+    }
   }
 
   function removeQuestion(index: number) {

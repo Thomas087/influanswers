@@ -33,10 +33,11 @@
       severity="secondary"
       outlined
       @click="briefStore.addQuestion"
+      :disabled="questionsList.length >= 20"
       class="add-button"
     />
     <p v-if="showValidationError" class="validation-error">
-      Please provide at least 3 questions before continuing.
+      Please provide between 3 and 20 questions before continuing.
     </p>
   </section>
 </template>
