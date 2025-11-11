@@ -13,7 +13,11 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix --cache",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "sync-payment-handler": "node scripts/sync-payment-handler.js",
+    "deploy:payment-intent": "npm run sync-payment-handler && supabase functions deploy create-payment-intent",
+    "deploy:payment-intent-test": "npm run sync-payment-handler && supabase functions deploy create-payment-intent-test",
+    "deploy:payment-functions": "npm run sync-payment-handler && supabase functions deploy create-payment-intent && supabase functions deploy create-payment-intent-test"
   },
   "dependencies": {
     "@primeuix/themes": "^1.2.5",

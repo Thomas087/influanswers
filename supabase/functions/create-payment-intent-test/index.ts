@@ -1,8 +1,8 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { handlePaymentIntentRequest } from './payment-intent-handler.ts'
 
-// Production function - uses STRIPE_SECRET_KEY
+// Test function - uses STRIPE_SECRET_KEY_TEST
 Deno.serve(async (req) => {
-  return handlePaymentIntentRequest(req, 'STRIPE_SECRET_KEY')
+  return handlePaymentIntentRequest(req, 'STRIPE_SECRET_KEY_TEST')
 })
 

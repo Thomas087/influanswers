@@ -228,8 +228,13 @@ const initializePayment = async () => {
     }
     stripe.value = stripeInstance
 
+    // Determine which function to use based on environment variable
+    // Defaults to production function, uses test function if VITE_USE_TEST_PAYMENT is true
+    const useTestPayment = import.meta.env.VITE_USE_TEST_PAYMENT === 'true'
+    const functionName = useTestPayment ? 'create-payment-intent-test' : 'create-payment-intent'
+
     // Create payment intent via Supabase Edge Function
-    const { data, error: createError } = await supabase.functions.invoke('create-payment-intent', {
+    const { data, error: createError } = await supabase.functions.invoke(functionName, {
       body: {
         amount: props.amount,
         currency: 'usd',
