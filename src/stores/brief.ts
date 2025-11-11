@@ -316,6 +316,65 @@ export const useBriefStore = defineStore('brief', () => {
     return [...qs]
   }
 
+  // Batch update from ChatGPT response - updates all fields at once and saves once
+  async function batchUpdateFromChatGPT(briefData: Brief) {
+    // Update brief fields
+    if (briefData.brief) {
+      if (briefData.brief.projectName) {
+        state.value.brief.projectName = briefData.brief.projectName
+      }
+      if (briefData.brief.brandBrief) {
+        state.value.brief.brandBrief = briefData.brief.brandBrief
+      }
+      if (briefData.brief.briefSummary) {
+        state.value.brief.briefSummary = briefData.brief.briefSummary
+      }
+      if (Array.isArray(briefData.brief.questions) && briefData.brief.questions.length > 0) {
+        // Ensure we have at least 3 question slots
+        const questions = [...briefData.brief.questions]
+        while (questions.length < 3) {
+          questions.push('')
+        }
+        state.value.brief.questions = questions
+      }
+    }
+
+    // Update selection fields
+    if (briefData.selection) {
+      if (typeof briefData.selection.numberOfInfluencers === 'number') {
+        state.value.selection.numberOfInfluencers = briefData.selection.numberOfInfluencers
+      }
+      if (Array.isArray(briefData.selection.platforms)) {
+        state.value.selection.platforms = briefData.selection.platforms
+      }
+      if (Array.isArray(briefData.selection.categories)) {
+        state.value.selection.categories = briefData.selection.categories
+      }
+      if (Array.isArray(briefData.selection.regions)) {
+        state.value.selection.regions = briefData.selection.regions
+      }
+      if (Array.isArray(briefData.selection.audienceSize)) {
+        state.value.selection.audienceSize = briefData.selection.audienceSize
+      }
+      if (Array.isArray(briefData.selection.gender)) {
+        state.value.selection.gender = briefData.selection.gender
+      }
+      if (Array.isArray(briefData.selection.contentFormat)) {
+        state.value.selection.contentFormat = briefData.selection.contentFormat
+      }
+      if (Array.isArray(briefData.selection.previousCollaborations)) {
+        state.value.selection.previousCollaborations = briefData.selection.previousCollaborations
+      }
+      if (briefData.selection.additionalNotes !== undefined && briefData.selection.additionalNotes !== null) {
+        state.value.selection.additionalNotes = briefData.selection.additionalNotes
+      }
+    }
+
+    // Save to localStorage and Supabase once after all updates
+    saveToStorage(state.value)
+    await saveToSupabase()
+  }
+
   // Reset
   function reset() {
     state.value = createDefaultBrief()
@@ -354,6 +413,7 @@ export const useBriefStore = defineStore('brief', () => {
     updateUserInfo,
     saveToSupabase,
     loadFromSupabase,
+    batchUpdateFromChatGPT,
     reset,
   }
 })
