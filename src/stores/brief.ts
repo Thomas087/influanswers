@@ -316,6 +316,13 @@ export const useBriefStore = defineStore('brief', () => {
     return [...qs]
   }
 
+  // Set brandBrief without triggering a save (used when resetting for new brief)
+  function setBrandBriefWithoutSave(value: string) {
+    state.value.brief.brandBrief = value
+    saveToStorage(state.value)
+    // Don't call saveToSupabase() - let the batch update handle it
+  }
+
   // Batch update from ChatGPT response - updates all fields at once and saves once
   async function batchUpdateFromChatGPT(briefData: Brief) {
     // Update brief fields
@@ -414,6 +421,7 @@ export const useBriefStore = defineStore('brief', () => {
     saveToSupabase,
     loadFromSupabase,
     batchUpdateFromChatGPT,
+    setBrandBriefWithoutSave,
     reset,
   }
 })

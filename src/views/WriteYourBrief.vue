@@ -56,7 +56,7 @@
 
           <StepPanels>
             <StepPanel v-for="step in steps" :key="step.value" :value="step.value">
-              <WriteBriefStep v-if="step.value === 1" />
+              <WriteBriefStep v-if="step.value === 1" ref="writeBriefStepRef" />
               <QuestionsStep v-else-if="step.value === 2" />
               <SelectInfluencersStep v-else-if="step.value === 3" />
               <ConfirmStep v-else-if="step.value === 4" />
@@ -89,27 +89,14 @@
               outlined
               :loading="isProcessingChatGPT"
               :disabled="(currentStep.isDisabled?.() ?? false) || isProcessingChatGPT"
-              @click="
-                async () => {
-                  try {
-                    await handleChatGPTRequest()
-                    if (activeStep < steps.length) activeStep++
-                  } catch (error) {
-                    // Error already handled in handleChatGPTRequest
-                  }
-                }
-              "
+              @click="handleGenerateNewBrief"
             />
             <Button
               label="Continue"
               icon="pi pi-arrow-right"
               icon-pos="right"
               :disabled="currentStep.isDisabled?.() ?? false"
-              @click="
-                () => {
-                  if (activeStep < steps.length) activeStep++
-                }
-              "
+              @click="handleContinueFromStep1"
             />
           </div>
         </template>
@@ -137,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted, onMounted } from 'vue'
+import { ref, computed, watch, onUnmounted, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import Stepper from 'primevue/stepper'
@@ -160,6 +147,7 @@ const activeStep = ref(1)
 const isProcessingChatGPT = ref(false)
 const toast = useToast()
 const briefStore = useBriefStore()
+const writeBriefStepRef = ref<{ save: () => void; getCurrentValue: () => string } | null>(null)
 
 // Load brief from Supabase on mount
 onMounted(async () => {
@@ -287,6 +275,18 @@ const steps = computed(() => [
 const nextStep = async () => {
   console.log('nextStep called, current step:', activeStep.value)
 
+  // Save brandBrief if we're on step 1 before proceeding
+  if (activeStep.value === 1) {
+    await nextTick()
+    // Handle case where ref might be an array (from v-for)
+    const componentRef = Array.isArray(writeBriefStepRef.value) 
+      ? writeBriefStepRef.value[0] 
+      : writeBriefStepRef.value
+    if (componentRef && typeof componentRef.save === 'function') {
+      componentRef.save()
+    }
+  }
+
   // If moving from step 1 to step 2, call ChatGPT API first
   if (activeStep.value === 1 && briefStore.brief.brandBrief.trim()) {
     try {
@@ -369,6 +369,63 @@ const handleChatGPTRequest = async () => {
     throw error
   } finally {
     isProcessingChatGPT.value = false
+  }
+}
+
+const handleGenerateNewBrief = async () => {
+  if (isProcessingChatGPT.value) {
+    return
+  }
+
+  // Get the current brandBrief from the component's local state (may be unsaved)
+  // This ensures we capture any unsaved changes the user has typed
+  await nextTick()
+  let currentBrandBrief = briefStore.brief.brandBrief
+  // Handle case where ref might be an array (from v-for)
+  const componentRef = Array.isArray(writeBriefStepRef.value) 
+    ? writeBriefStepRef.value[0] 
+    : writeBriefStepRef.value
+  if (componentRef && typeof componentRef.getCurrentValue === 'function') {
+    const unsavedValue = componentRef.getCurrentValue()
+    if (unsavedValue) {
+      currentBrandBrief = unsavedValue
+    }
+  }
+
+  // Reset the store to clear all data and create a new Supabase entry
+  // This clears the briefId, so a new entry will be created on save
+  briefStore.reset()
+
+  // Restore the brandBrief without triggering a save
+  // We'll save everything together after generating the new brief
+  if (currentBrandBrief) {
+    briefStore.setBrandBriefWithoutSave(currentBrandBrief)
+  }
+
+  // Generate the new brief
+  // This will create a new Supabase entry with all the data at once
+  try {
+    await handleChatGPTRequest()
+    if (activeStep.value < steps.value.length) {
+      activeStep.value++
+    }
+  } catch {
+    // Error already handled in handleChatGPTRequest
+  }
+}
+
+const handleContinueFromStep1 = async () => {
+  // Save brandBrief before advancing
+  await nextTick()
+  // Handle case where ref might be an array (from v-for)
+  const componentRef = Array.isArray(writeBriefStepRef.value) 
+    ? writeBriefStepRef.value[0] 
+    : writeBriefStepRef.value
+  if (componentRef && typeof componentRef.save === 'function') {
+    componentRef.save()
+  }
+  if (activeStep.value < steps.value.length) {
+    activeStep.value++
   }
 }
 

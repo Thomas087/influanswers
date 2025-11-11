@@ -12,9 +12,7 @@
     </div>
     <div class="form-field">
       <Textarea
-        id="project-description"
-        :modelValue="briefStore.brief.brandBrief"
-        @update:modelValue="briefStore.updateField('brandBrief', $event || '')"
+        v-model="localBrandBrief"
         rows="12"
         auto-resize
         placeholder="Enter your project details here..."
@@ -24,10 +22,35 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch, defineExpose } from 'vue'
 import Textarea from 'primevue/textarea'
 import { useBriefStore } from '@/stores/brief'
 
 const briefStore = useBriefStore()
+
+// Local state for the textarea - only saved when user clicks Continue or submits
+const localBrandBrief = ref(briefStore.brief.brandBrief)
+
+// Sync local state when store changes (e.g., after reset or load)
+watch(() => briefStore.brief.brandBrief, (newValue) => {
+  localBrandBrief.value = newValue
+  console.log(localBrandBrief.value)
+})
+
+// Save current value to store (called by parent on Continue/submit)
+const save = () => {
+  console.log(localBrandBrief.value)
+  briefStore.updateField('brandBrief', localBrandBrief.value)
+}
+
+// Get current value (for getting unsaved changes)
+const getCurrentValue = () => localBrandBrief.value
+
+// Expose methods to parent component
+defineExpose({
+  save,
+  getCurrentValue,
+})
 </script>
 
 <style scoped>
