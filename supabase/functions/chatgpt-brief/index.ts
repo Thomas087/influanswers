@@ -27,8 +27,8 @@ const BRIEF_RESPONSE_SCHEMA = {
           type: 'array',
           items: { type: 'string' },
           minItems: 5,
-          maxItems: 5,
-          description: 'List of exactly 5 key questions to be asked to influencers',
+          maxItems: 8,
+          description: 'List of 5 to 8 key questions to be asked to influencers',
         },
       },
     },
@@ -428,7 +428,7 @@ Deno.serve(async (req) => {
 Based on the following client-provided brand brief, generate:
 1. A concise project name
 2. A brief summary (2-3 sentences) that summarizes the project
-3. Exactly 5 key questions to be asked to the influencers in order to answer the brief requests
+3. 5 to 8 key questions to be asked to the influencers in order to answer the brief requests. Write them as open, strategic, and insight-driven questions. Keep them short and open (prioritize open questions, avoid creating bias by offering answer suggestions unless necessary)
 4. Recommended influencer selection criteria including:
    - Number of influencers: Use 10 as the default unless the client brief explicitly specifies a different number (must be between 10-500)
    - Relevant platforms (select from the valid enum values)
@@ -465,7 +465,7 @@ You must respond with a single JSON object (NOT an array) with this exact struct
     "projectName": "string - A concise, descriptive project name",
     "brandBrief": "string - Copy the EXACT client-provided brand brief verbatim (do not modify or expand it)",
     "briefSummary": "string - A NEW brief summary (2-3 sentences) that you generate based on the client brief",
-    "questions": ["string", "string", "string", "string", "string"]  // EXACTLY 5 questions
+    "questions": ["string", "string", "string", "string", "string"]  // 5 to 8 questions. Write them as open, strategic, and insight-driven questions.
   },
   "selection": {
     "numberOfInfluencers": 10,  // integer between 10-500 (default to 10 unless client brief specifies otherwise)
@@ -485,8 +485,11 @@ IMPORTANT:
 - The root must be an object with "brief" and "selection" keys
 - All arrays must be arrays (even if empty), not null
 - Use empty array [] for optional audienceSize if not applicable, and empty string "" for additionalNotes if not applicable
-- questions must be EXACTLY 5 items
-- All enum values must match exactly (lowercase, with hyphens where specified)`
+- questions must be 5 to 8 items
+- All enum values must match exactly (lowercase, with hyphens where specified)
+- brandBrief MUST be the exact client-provided text (copy it verbatim)
+- briefSummary MUST be a new summary you generate (2-3 sentences)
+- numberOfInfluencers should default to 10 unless the client brief explicitly mentions a specific number`
 
     // Call OpenAI Responses API with structured outputs
     const response = await fetch('https://api.openai.com/v1/responses', {
@@ -765,14 +768,18 @@ IMPORTANT:
       )
     }
 
-    // Validate questions array has exactly 5 items
-    if (!Array.isArray(briefData.brief.questions) || briefData.brief.questions.length !== 5) {
+    // Validate questions array has 5 to 8 items
+    if (
+      !Array.isArray(briefData.brief.questions) ||
+      briefData.brief.questions.length < 5 ||
+      briefData.brief.questions.length > 8
+    ) {
       console.error('Invalid questions array:', briefData.brief.questions)
       return new Response(
         JSON.stringify({
           success: false,
           error: 'Invalid questions format',
-          details: `Questions must be an array with exactly 5 items. Received: ${briefData.brief.questions?.length || 0} items`,
+          details: `Questions must be an array with 5 to 8 items. Received: ${briefData.brief.questions?.length || 0} items`,
         }),
         {
           status: 500,
