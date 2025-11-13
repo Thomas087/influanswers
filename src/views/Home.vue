@@ -6,11 +6,13 @@
       <div class="hero-container">
         <div class="hero-content">
           <div class="hero-text">
-            <h1 class="hero-title">Get real insights from influencers — powered by A.I.</h1>
+            <h1 class="hero-title">Get real answers from real people.</h1>
             <p class="hero-description">
-              Influanswers uses artificial intelligence to survey hundreds of influencers and
-              deliver high-quality, actionable insights about your brand or business.
+              Senvio uses artificial intelligence to directly survey real customers and influencers identified through social media, delivering high-quality, actionable insights for your brand.
             </p>
+            <router-link to="/brief" class="hero-button-link">
+              <Button size="large" label="Get Started" />
+            </router-link>
           </div>
           <div class="hero-image">
             <img src="/img/influanswers-hero.png" alt="Market Research" />
@@ -29,7 +31,7 @@
               <img src="/icon/brief.svg" alt="Brief icon" />
             </div>
             <h3 class="step-title">Define your brief</h3>
-            <p class="step-description">What do you want to know about your brand?</p>
+            <p class="step-description">Tell us exactly which questions you want customers or influencers to answer.</p>
           </div>
           <div class="step-card">
             <div class="step-icon">
@@ -37,7 +39,7 @@
             </div>
             <h3 class="step-title">Choose your audience</h3>
             <p class="step-description">
-              Select influencers or customers by location, size, niche, or past collaborations.
+              Select the customers or influencers you want to reach, based on location, purchasing behavior, size, or past collaborations.
             </p>
           </div>
           <div class="step-card">
@@ -46,7 +48,7 @@
             </div>
             <h3 class="step-title">Receive your report</h3>
             <p class="step-description">
-              Get detailed, data-backed answers to your questions within 7 days.
+              Get a clear, data-backed report summarizing their answers — delivered within 7 days.
             </p>
           </div>
         </div>
@@ -83,7 +85,7 @@
     <!-- Why Brands Love Section -->
     <section id="benefits" class="benefits-section">
       <div class="benefits-container">
-        <h2 class="section-title">Why brands love Influanswers</h2>
+        <h2 class="section-title">Why brands love Senvio</h2>
         <div class="benefits-grid">
           <div class="benefit-card">
             <h3 class="benefit-title">Transparent pricing</h3>
@@ -158,10 +160,10 @@
         <div class="card">
           <Accordion value="0">
             <AccordionPanel value="0">
-              <AccordionHeader>How does Influanswers work?</AccordionHeader>
+              <AccordionHeader>How does Senvio work?</AccordionHeader>
               <AccordionContent>
                 <p class="m-0">
-                  Influanswers uses A.I. to connect your brief with relevant influencers or
+                  Senvio uses A.I. to connect your brief with relevant influencers or
                   customers. Our system gathers their opinions, filters low-quality responses, and
                   delivers a clean, data-driven report within a few days. You simply define what you
                   want to know — we handle the rest.
@@ -264,7 +266,7 @@
               <AccordionHeader>Can I run recurring or international polls?</AccordionHeader>
               <AccordionContent>
                 <p class="m-0">
-                  Absolutely. Influanswers is designed to scale — you can run ongoing surveys,
+                  Absolutely. Senvio is designed to scale — you can run ongoing surveys,
                   compare results across markets, and poll influencers in multiple languages or
                   regions.
                 </p>
@@ -282,19 +284,23 @@
         <p class="cta-description">
           Get honest, data-driven answers about your brand — in just a few clicks.
         </p>
-        <a class="cta-button" href="/brief">Get Started</a>
+        <Button size="large" label="Get Started" @click="router.push('/brief')" />
       </div>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import Header from '../components/Header.vue'
+import Button from 'primevue/button'
 
 import Accordion from 'primevue/accordion'
 import AccordionPanel from 'primevue/accordionpanel'
 import AccordionHeader from 'primevue/accordionheader'
 import AccordionContent from 'primevue/accordioncontent'
+
+const router = useRouter()
 </script>
 
 <style scoped>
@@ -341,6 +347,12 @@ import AccordionContent from 'primevue/accordioncontent'
   line-height: 1.6;
   color: #666;
   margin: 0;
+}
+
+.hero-button-link {
+  display: inline-block;
+  margin-top: 8px;
+  text-decoration: none;
 }
 
 .hero-image {
@@ -694,27 +706,6 @@ import AccordionContent from 'primevue/accordioncontent'
   line-height: 1.6;
   color: #666;
   margin: 0 0 40px 0;
-}
-
-.cta-button {
-  background-color: #6348ed;
-  color: white;
-  border: none;
-  padding: 16px 48px;
-  font-size: 18px;
-  font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  text-decoration: none;
-}
-
-.cta-button:hover {
-  background-color: #5238d4;
-}
-
-.cta-button:active {
-  background-color: #4530b8;
 }
 
 /* Responsive Design */

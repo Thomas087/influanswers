@@ -6,7 +6,7 @@
     <div class="fixed-top-header">
       <div class="top-header-content">
         <nav class="breadcrumbs">
-          <button class="breadcrumb-item" @click="router.push('/')">Influanswers</button>
+          <button class="breadcrumb-item" @click="router.push('/')">Senvio</button>
           <span class="breadcrumb-separator">/</span>
           <span class="breadcrumb-item breadcrumb-item--current">
             {{ currentStep?.label || 'Write your brief' }}
@@ -31,7 +31,7 @@
           <h1 class="page-title">Write your brief</h1>
           <p class="page-subtitle">
             Follow the guided steps to frame your research, select who you want to hear from, and
-            send it to the Influanswers team.
+            send it to the Senvio team.
           </p>
         </div>
         <!-- <div class="header-aside">

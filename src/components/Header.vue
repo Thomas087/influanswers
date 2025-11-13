@@ -2,10 +2,10 @@
   <header class="top-nav">
     <div class="nav-container">
       <router-link v-if="!isHomePage" class="nav-logo" to="/">
-        <img src="/influanswers-logo.png" alt="Influanswers logo" />
+        <img src="/senvio-logo.svg" alt="Senvio logo" />
       </router-link>
       <a v-else class="nav-logo" href="#hero">
-        <img src="/influanswers-logo.png" alt="Influanswers logo" />
+        <img src="/senvio-logo.svg" alt="Senvio logo" />
       </a>
       <nav class="nav-links">
         <router-link v-if="!isHomePage" class="nav-link" to="/">Home</router-link>
@@ -16,8 +16,12 @@
         <a class="nav-link" :href="isHomePage ? '#faq' : '/#faq'">FAQ</a>
       </nav>
       <div class="nav-actions">
-        <router-link class="nav-button nav-button--ghost" to="/login">Login</router-link>
-        <router-link class="nav-button nav-button--primary" to="/brief">Write your brief</router-link>
+        <router-link to="/login" class="nav-action-link">
+          <Button label="Login" severity="secondary" outlined />
+        </router-link>
+        <router-link to="/brief" class="nav-action-link">
+          <Button label="Write your brief" />
+        </router-link>
       </div>
       <Button
         class="mobile-menu-button"
@@ -154,6 +158,10 @@ const toggleMenu = (event: MouseEvent) => {
   gap: 12px;
 }
 
+.nav-action-link {
+  text-decoration: none;
+}
+
 .mobile-menu-button {
   display: none;
   margin-left: auto;
@@ -189,43 +197,6 @@ const toggleMenu = (event: MouseEvent) => {
 
 .mobile-menu-button .hamburger-icon::after {
   top: 6px;
-}
-
-.nav-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 18px;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: 600;
-  text-decoration: none;
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.nav-button--ghost {
-  color: #6348ed;
-  border: 1px solid rgba(99, 72, 237, 0.4);
-  background-color: transparent;
-}
-
-.nav-button--ghost:hover {
-  border-color: #6348ed;
-  background-color: rgba(99, 72, 237, 0.08);
-}
-
-.nav-button--primary {
-  color: #ffffff;
-  background-color: #6348ed;
-  border: 1px solid #6348ed;
-}
-
-.nav-button--primary:hover {
-  background-color: #5238d4;
-  border-color: #5238d4;
 }
 
 @media (max-width: 768px) {
