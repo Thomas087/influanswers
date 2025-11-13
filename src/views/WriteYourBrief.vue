@@ -197,6 +197,27 @@ watch(isProcessingChatGPT, (isLoading) => {
   }
 })
 
+// Scroll to top when step changes
+watch(activeStep, () => {
+  nextTick(() => {
+    // Temporarily override CSS scroll-behavior for instant scroll
+    const html = document.documentElement
+    const originalScrollBehavior = html.style.scrollBehavior
+    html.style.scrollBehavior = 'auto'
+    
+    // Use requestAnimationFrame to ensure style change takes effect
+    requestAnimationFrame(() => {
+      // Scroll to top instantly
+      window.scrollTo(0, 0)
+      
+      // Restore original scroll behavior after scroll completes
+      requestAnimationFrame(() => {
+        html.style.scrollBehavior = originalScrollBehavior || ''
+      })
+    })
+  })
+})
+
 // Cleanup on unmount
 onUnmounted(() => {
   if (loadingMessageInterval.value !== null) {

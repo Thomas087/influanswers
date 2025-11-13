@@ -28,6 +28,14 @@ const router = createRouter({
       component: Login,
     },
   ],
+  scrollBehavior(to, from, savedPosition) {
+    // If there's a saved position (e.g., browser back/forward), use it
+    if (savedPosition) {
+      return savedPosition
+    }
+    // Otherwise, scroll to top
+    return { top: 0 }
+  },
 })
 
 export default router
