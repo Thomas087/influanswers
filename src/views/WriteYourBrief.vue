@@ -254,7 +254,18 @@ const steps = computed(() => [
     nextIconPos: 'right',
     nextSeverity: undefined,
     isSubmit: false,
-    isDisabled: () => !briefStore.isBriefValid,
+    isDisabled: () => {
+      // Check both store value and component's local value (for unsaved changes)
+      const storeValue = briefStore.brief.brandBrief.trim().length > 0
+      const componentRef = Array.isArray(writeBriefStepRef.value) 
+        ? writeBriefStepRef.value[0] 
+        : writeBriefStepRef.value
+      if (componentRef && typeof componentRef.getCurrentValue === 'function') {
+        const localValue = componentRef.getCurrentValue()?.trim().length > 0
+        return !(storeValue || localValue)
+      }
+      return !storeValue
+    },
     showNextButton: hasOtherStepsContent.value, // Show secondary "Next" button if other steps have content
   },
   {
