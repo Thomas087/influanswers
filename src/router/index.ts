@@ -4,6 +4,7 @@ import WriteYourBrief from '../views/WriteYourBrief.vue'
 import PaymentConfirmation from '../views/PaymentConfirmation.vue'
 import Login from '../views/Login.vue'
 import DemoReport from '../views/DemoReport.vue'
+import DemoTranscripts from '../views/DemoTranscripts.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +33,11 @@ const router = createRouter({
       path: '/demo-report',
       name: 'demo-report',
       component: DemoReport,
+    },
+    {
+      path: '/demo-transcripts',
+      name: 'demo-transcripts',
+      component: DemoTranscripts,
     },
   ],
   scrollBehavior(to, from, savedPosition) {
