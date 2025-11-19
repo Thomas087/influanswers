@@ -100,9 +100,9 @@
         <Card class="question-section-card">
           <template #content>
             <div class="section-header">
-              <h2 class="section-title">Purchase Drivers</h2>
-              <p class="section-subtitle">{{ reportData.survey.questions.purchase_drivers.title }}</p>
+              <p class="section-insight">{{ reportData.survey.questions.purchase_drivers.title }}</p>
             </div>
+            <div class="question-text">{{ reportData.survey.questions.purchase_drivers.question_text }}</div>
             <div class="chart-controls">
               <SelectButton
                 v-model="selectedCountry"
@@ -138,9 +138,9 @@
         <Card class="question-section-card">
           <template #content>
             <div class="section-header">
-              <h2 class="section-title">Other Brands Purchased</h2>
-              <p class="section-subtitle">{{ reportData.survey.questions.other_brands_purchased.title }}</p>
+              <p class="section-insight">{{ reportData.survey.questions.other_brands_purchased.title }}</p>
             </div>
+            <div class="question-text">{{ reportData.survey.questions.other_brands_purchased.question_text }}</div>
             <div class="chart-controls">
               <SelectButton
                 v-model="selectedCountry"
@@ -1100,20 +1100,24 @@ const otherBrandsOptions = ref({
 
 .section-header {
   margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.section-title {
-  font-size: 28px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 8px 0;
-}
-
-.section-subtitle {
-  font-size: 15px;
-  font-weight: 400;
-  color: #64748b;
+.section-insight {
+  font-size: 20px;
+  font-weight: 500;
+  color: #475569;
   margin: 0;
+  line-height: 1.6;
+}
+
+.question-text {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin: 0 0 32px 0;
   line-height: 1.6;
 }
 
@@ -1199,8 +1203,12 @@ const otherBrandsOptions = ref({
     font-size: 24px;
   }
 
-  .section-title {
-    font-size: 32px;
+  .question-text {
+    font-size: 20px;
+  }
+
+  .section-insight {
+    font-size: 22px;
   }
 }
 
@@ -1261,6 +1269,19 @@ const otherBrandsOptions = ref({
 
   .question-section-card :deep(.p-card-body) {
     padding: 24px 16px;
+  }
+
+  .question-text {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+
+  .section-header {
+    padding-bottom: 20px;
+  }
+
+  .section-insight {
+    font-size: 18px;
   }
 }
 </style>
