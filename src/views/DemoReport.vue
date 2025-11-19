@@ -170,6 +170,44 @@
           </template>
         </Card>
       </div>
+
+      <!-- Product Obtainment Section -->
+      <div class="report-section">
+        <Card class="question-section-card">
+          <template #content>
+            <div class="section-header">
+              <p class="section-insight">{{ reportData.survey.questions.product_obtainment.title }}</p>
+            </div>
+            <div class="question-text">{{ reportData.survey.questions.product_obtainment.question_text }}</div>
+            <div class="chart-controls">
+              <SelectButton
+                v-model="selectedCountry"
+                :options="countryOptions"
+                optionLabel="label"
+                optionValue="value"
+                class="country-selector"
+              />
+            </div>
+            <div class="brands-grid">
+              <Card
+                v-for="brand in reportData.report.brands"
+                :key="`obtainment-${brand}`"
+                class="brand-card"
+              >
+                <template #title>{{ brand }}</template>
+                <template #content>
+                  <Chart
+                    type="bar"
+                    :data="getProductObtainmentDataForBrand(brand)"
+                    :options="productObtainmentOptions"
+                    class="chart-container"
+                  />
+                </template>
+              </Card>
+            </div>
+          </template>
+        </Card>
+      </div>
     </div>
   </div>
 </template>
@@ -473,6 +511,73 @@ const reportData = {
               "Kiehl's": 14,
               Guerlain: 4,
               'La Roche-Posay': 12,
+            },
+          },
+        },
+      },
+      product_obtainment: {
+        title:
+          'Online shopping dominates across all markets, with brand-owned stores showing stronger presence in home markets. Brand gifting and seeding programs remain minimal across all brands.',
+        question_text: 'How do you usually obtain products from this brand?',
+        answers: {
+          JP: {
+            Shiseido: {
+              'Purchase online': 8,
+              'Purchase in a brand-owned store': 9,
+              'Purchase from a third-party retailer': 3,
+              'Receive products through brand gifting or seeding': 0,
+            },
+            Lancôme: {
+              'Purchase online': 9,
+              'Purchase in a brand-owned store': 6,
+              'Purchase from a third-party retailer': 5,
+              'Receive products through brand gifting or seeding': 0,
+            },
+            'Estée Lauder': {
+              'Purchase online': 10,
+              'Purchase in a brand-owned store': 4,
+              'Purchase from a third-party retailer': 5,
+              'Receive products through brand gifting or seeding': 1,
+            },
+          },
+          FR: {
+            Shiseido: {
+              'Purchase online': 9,
+              'Purchase in a brand-owned store': 5,
+              'Purchase from a third-party retailer': 6,
+              'Receive products through brand gifting or seeding': 0,
+            },
+            Lancôme: {
+              'Purchase online': 7,
+              'Purchase in a brand-owned store': 10,
+              'Purchase from a third-party retailer': 3,
+              'Receive products through brand gifting or seeding': 0,
+            },
+            'Estée Lauder': {
+              'Purchase online': 9,
+              'Purchase in a brand-owned store': 5,
+              'Purchase from a third-party retailer': 5,
+              'Receive products through brand gifting or seeding': 1,
+            },
+          },
+          US: {
+            Shiseido: {
+              'Purchase online': 11,
+              'Purchase in a brand-owned store': 3,
+              'Purchase from a third-party retailer': 6,
+              'Receive products through brand gifting or seeding': 0,
+            },
+            Lancôme: {
+              'Purchase online': 10,
+              'Purchase in a brand-owned store': 4,
+              'Purchase from a third-party retailer': 5,
+              'Receive products through brand gifting or seeding': 1,
+            },
+            'Estée Lauder': {
+              'Purchase online': 10,
+              'Purchase in a brand-owned store': 5,
+              'Purchase from a third-party retailer': 4,
+              'Receive products through brand gifting or seeding': 1,
             },
           },
         },
@@ -929,6 +1034,91 @@ const otherBrandsOptions = ref({
       beginAtZero: true,
       ticks: {
         stepSize: 5,
+      },
+    },
+  },
+  responsive: true,
+  maintainAspectRatio: false,
+})
+
+// Product Obtainment Chart - returns data for a specific brand
+function getProductObtainmentDataForBrand(brand: string) {
+  const options = [
+    'Purchase online',
+    'Purchase in a brand-owned store',
+    'Purchase from a third-party retailer',
+    'Receive products through brand gifting or seeding',
+  ]
+
+  const brandIndex = reportData.report.brands.indexOf(brand)
+  const brandColor = ['#6348ed', '#8b5cf6', '#c4b5fd'][brandIndex]
+
+  if (selectedCountry.value === 'Global') {
+    const aggregated: Record<string, number> = {}
+    for (const option of options) {
+      aggregated[option] = sumNumbers(
+        reportData.report.countries.map((country) => {
+          return (
+            reportData.survey.questions.product_obtainment.answers[country as 'JP' | 'FR' | 'US'][
+              brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+            ][option as keyof typeof reportData.survey.questions.product_obtainment.answers.JP.Shiseido] as number
+          )
+        })
+      )
+    }
+
+    // Sort by value in descending order
+    const sorted = options
+      .map((option) => [option, aggregated[option]] as [string, number])
+      .sort((a, b) => b[1] - a[1])
+
+    return {
+      labels: sorted.map((item) => item[0]),
+      datasets: [
+        {
+          label: brand,
+          data: sorted.map((item) => item[1]),
+          backgroundColor: brandColor,
+        },
+      ],
+    }
+  } else {
+    const country = selectedCountry.value as 'JP' | 'FR' | 'US'
+    const data = options.map((option) => [
+      option,
+      reportData.survey.questions.product_obtainment.answers[country][
+        brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+      ][option as keyof typeof reportData.survey.questions.product_obtainment.answers.JP.Shiseido] as number,
+    ] as [string, number])
+
+    // Sort by value in descending order
+    const sorted = data.sort((a, b) => b[1] - a[1])
+
+    return {
+      labels: sorted.map((item) => item[0]),
+      datasets: [
+        {
+          label: brand,
+          data: sorted.map((item) => item[1]),
+          backgroundColor: brandColor,
+        },
+      ],
+    }
+  }
+}
+
+const productObtainmentOptions = ref({
+  indexAxis: 'y' as const,
+  plugins: {
+    legend: {
+      display: false,
+    },
+  },
+  scales: {
+    x: {
+      beginAtZero: true,
+      ticks: {
+        stepSize: 2,
       },
     },
   },
