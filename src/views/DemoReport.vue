@@ -97,70 +97,78 @@
 
       <!-- Purchase Drivers Section -->
       <div class="report-section">
-        <div class="section-header">
-          <h2 class="section-title">Purchase Drivers</h2>
-          <p class="section-subtitle">{{ reportData.survey.questions.purchase_drivers.title }}</p>
-        </div>
-        <div class="chart-controls">
-          <SelectButton
-            v-model="selectedCountry"
-            :options="countryOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="country-selector"
-          />
-        </div>
-        <div class="brands-grid">
-          <Card
-            v-for="brand in reportData.report.brands"
-            :key="`purchase-${brand}`"
-            class="brand-card"
-          >
-            <template #title>{{ brand }}</template>
-            <template #content>
-              <Chart
-                type="bar"
-                :data="getPurchaseDriversDataForBrand(brand)"
-                :options="purchaseDriversOptions"
-                class="chart-container"
+        <Card class="question-section-card">
+          <template #content>
+            <div class="section-header">
+              <h2 class="section-title">Purchase Drivers</h2>
+              <p class="section-subtitle">{{ reportData.survey.questions.purchase_drivers.title }}</p>
+            </div>
+            <div class="chart-controls">
+              <SelectButton
+                v-model="selectedCountry"
+                :options="countryOptions"
+                optionLabel="label"
+                optionValue="value"
+                class="country-selector"
               />
-            </template>
-          </Card>
-        </div>
+            </div>
+            <div class="brands-grid">
+              <Card
+                v-for="brand in reportData.report.brands"
+                :key="`purchase-${brand}`"
+                class="brand-card"
+              >
+                <template #title>{{ brand }}</template>
+                <template #content>
+                  <Chart
+                    type="bar"
+                    :data="getPurchaseDriversDataForBrand(brand)"
+                    :options="purchaseDriversOptions"
+                    class="chart-container"
+                  />
+                </template>
+              </Card>
+            </div>
+          </template>
+        </Card>
       </div>
 
       <!-- Other Brands Purchased Section -->
       <div class="report-section">
-        <div class="section-header">
-          <h2 class="section-title">Other Brands Purchased</h2>
-          <p class="section-subtitle">{{ reportData.survey.questions.other_brands_purchased.title }}</p>
-        </div>
-        <div class="chart-controls">
-          <SelectButton
-            v-model="selectedCountry"
-            :options="countryOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="country-selector"
-          />
-        </div>
-        <div class="brands-grid">
-          <Card
-            v-for="brand in reportData.report.brands"
-            :key="`brands-${brand}`"
-            class="brand-card"
-          >
-            <template #title>{{ brand }}</template>
-            <template #content>
-              <Chart
-                type="bar"
-                :data="getOtherBrandsDataForBrand(brand)"
-                :options="otherBrandsOptions"
-                class="chart-container"
+        <Card class="question-section-card">
+          <template #content>
+            <div class="section-header">
+              <h2 class="section-title">Other Brands Purchased</h2>
+              <p class="section-subtitle">{{ reportData.survey.questions.other_brands_purchased.title }}</p>
+            </div>
+            <div class="chart-controls">
+              <SelectButton
+                v-model="selectedCountry"
+                :options="countryOptions"
+                optionLabel="label"
+                optionValue="value"
+                class="country-selector"
               />
-            </template>
-          </Card>
-        </div>
+            </div>
+            <div class="brands-grid">
+              <Card
+                v-for="brand in reportData.report.brands"
+                :key="`brands-${brand}`"
+                class="brand-card"
+              >
+                <template #title>{{ brand }}</template>
+                <template #content>
+                  <Chart
+                    type="bar"
+                    :data="getOtherBrandsDataForBrand(brand)"
+                    :options="otherBrandsOptions"
+                    class="chart-container"
+                  />
+                </template>
+              </Card>
+            </div>
+          </template>
+        </Card>
       </div>
     </div>
   </div>
@@ -487,22 +495,6 @@ const totalRespondents = computed(() => {
   return reportData.report.countries.length * reportData.report.brands.length * 20
 })
 
-// Helper function to aggregate data across countries
-function aggregateData<T>(
-  dataByCountry: Record<string, Record<string, T>>,
-  aggregator: (values: T[]) => T
-): Record<string, T> {
-  const result: Record<string, T> = {}
-  const keys = Object.keys(dataByCountry[Object.keys(dataByCountry)[0]])
-
-  for (const key of keys) {
-    const values = Object.values(dataByCountry).map((countryData) => countryData[key])
-    result[key] = aggregator(values)
-  }
-
-  return result
-}
-
 // Helper to sum numbers
 function sumNumbers(numbers: number[]): number {
   return numbers.reduce((a, b) => a + b, 0)
@@ -580,7 +572,7 @@ const ageDistributionPieOptions = ref({
     },
     tooltip: {
       callbacks: {
-        label: function (context: any) {
+        label: function (context: { label: string; parsed: number; dataset: { data: number[] } }) {
           const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
           const percentage = ((context.parsed / total) * 100).toFixed(1)
           return context.label + ': ' + context.parsed + ' (' + percentage + '%)'
@@ -663,7 +655,7 @@ const genderDistributionPieOptions = ref({
     },
     tooltip: {
       callbacks: {
-        label: function (context: any) {
+        label: function (context: { label: string; parsed: number; dataset: { data: number[] } }) {
           const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
           const percentage = ((context.parsed / total) * 100).toFixed(1)
           return context.label + ': ' + context.parsed + ' (' + percentage + '%)'
@@ -748,7 +740,7 @@ const followerCountPieOptions = ref({
     },
     tooltip: {
       callbacks: {
-        label: function (context: any) {
+        label: function (context: { label: string; parsed: number; dataset: { data: number[] } }) {
           const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
           const percentage = ((context.parsed / total) * 100).toFixed(1)
           return context.label + ': ' + context.parsed + ' (' + percentage + '%)'
@@ -1091,6 +1083,21 @@ const otherBrandsOptions = ref({
   margin-top: 48px;
 }
 
+.question-section-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.question-section-card :deep(.p-card-body) {
+  padding: 32px;
+}
+
+.question-section-card :deep(.p-card-content) {
+  padding: 0;
+}
+
 .section-header {
   margin-bottom: 24px;
 }
@@ -1206,6 +1213,10 @@ const otherBrandsOptions = ref({
   .brands-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .question-section-card :deep(.p-card-body) {
+    padding: 28px 24px;
+  }
 }
 
 /* Mobile */
@@ -1246,6 +1257,10 @@ const otherBrandsOptions = ref({
   .country-selector-small :deep(.p-button) {
     padding: 0.3rem 0.5rem;
     font-size: 11px;
+  }
+
+  .question-section-card :deep(.p-card-body) {
+    padding: 24px 16px;
   }
 }
 </style>
