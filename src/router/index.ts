@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import WriteYourBrief from '../views/WriteYourBrief.vue'
 import PaymentConfirmation from '../views/PaymentConfirmation.vue'
 import Login from '../views/Login.vue'
+import DemoReport from '../views/DemoReport.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: Login,
+    },
+    {
+      path: '/demo-report',
+      name: 'demo-report',
+      component: DemoReport,
     },
   ],
   scrollBehavior(to, from, savedPosition) {
