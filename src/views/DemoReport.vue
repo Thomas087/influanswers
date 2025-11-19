@@ -140,6 +140,26 @@
                 </template>
               </Card>
             </div>
+            <div class="quotes-section">
+              <div class="quotes-header">
+                <p class="quotes-label">Supporting Quotes</p>
+                <router-link to="/demo-transcripts" class="quotes-link">See sample transcripts</router-link>
+              </div>
+              <div class="quotes-container">
+                <div class="quote-item">
+                  <p class="quote-text">"They have this reputation for serious skincare. Kind of like the brand your older cousin or your boss uses — very professional, very reliable. Also, their performance is strong. When they say a serum does something, I usually see the effect."</p>
+                  <p class="quote-source">Estée Lauder customer, Japan</p>
+                </div>
+                <div class="quote-item">
+                  <p class="quote-text">"Brand reputation is number one. I feel like if I post Lancôme, my followers immediately think 'luxury, trustworthy.' Then performance: I need the product to actually do something visible."</p>
+                  <p class="quote-source">Lancôme customer, Japan</p>
+                </div>
+                <div class="quote-item">
+                  <p class="quote-text">"Ingredients for sure. Product performance too — I don't want to gamble on skincare. And yeah, the brand's heritage gives me confidence."</p>
+                  <p class="quote-source">Shiseido customer, Japan</p>
+                </div>
+              </div>
+            </div>
           </template>
         </Card>
       </div>
@@ -177,6 +197,26 @@
                   />
                 </template>
               </Card>
+            </div>
+            <div class="quotes-section">
+              <div class="quotes-header">
+                <p class="quotes-label">Supporting Quotes</p>
+                <router-link to="/demo-transcripts" class="quotes-link">See sample transcripts</router-link>
+              </div>
+              <div class="quotes-container">
+                <div class="quote-item">
+                  <p class="quote-text">"Hmm… mostly social media ads and influencers reviewing them. But I also hear a bit from in-store consultants. In Japan, the staff are usually very knowledgeable and explain everything with so much detail."</p>
+                  <p class="quote-source">Estée Lauder customer, Japan</p>
+                </div>
+                <div class="quote-item">
+                  <p class="quote-text">"A mix: social media, especially Instagram, plus the brand's own newsletters and website. But honestly, in-store consultants play a big role too. They'll say, 'We have a new foundation, let me show you,' and suddenly I'm wearing it on half my face."</p>
+                  <p class="quote-source">Lancôme customer, France</p>
+                </div>
+                <div class="quote-item">
+                  <p class="quote-text">"Social media, 100%. Instagram, TikTok, YouTube shorts. I'll see an ad, then like two creators doing 'first impressions,' and that's how it lands on my radar."</p>
+                  <p class="quote-source">Lancôme customer, United States</p>
+                </div>
+              </div>
             </div>
           </template>
         </Card>
@@ -216,6 +256,26 @@
                 </template>
               </Card>
             </div>
+            <div class="quotes-section">
+              <div class="quotes-header">
+                <p class="quotes-label">Supporting Quotes</p>
+                <router-link to="/demo-transcripts" class="quotes-link">See sample transcripts</router-link>
+              </div>
+              <div class="quotes-container">
+                <div class="quote-item">
+                  <p class="quote-text">"Lancôme, Shiseido, Dior, and Clinique. Sometimes SK-II, but only when I feel like investing in something strong."</p>
+                  <p class="quote-source">Estée Lauder customer, Japan</p>
+                </div>
+                <div class="quote-item">
+                  <p class="quote-text">"Dior, Chanel, and Estée Lauder for makeup and fragrance. For skincare, I mix in Shiseido, Clarins, and La Roche-Posay. And there's always a bit of Kiehl's somewhere in my routine as well."</p>
+                  <p class="quote-source">Lancôme customer, France</p>
+                </div>
+                <div class="quote-item">
+                  <p class="quote-text">"Clinique, Shiseido, Lancôme, Dior, Kiehl's, La Roche-Posay… I like mixing luxury with practical brands depending on what my skin needs."</p>
+                  <p class="quote-source">Estée Lauder customer, United States</p>
+                </div>
+              </div>
+            </div>
           </template>
         </Card>
       </div>
@@ -253,6 +313,26 @@
                   />
                 </template>
               </Card>
+            </div>
+            <div class="quotes-section">
+              <div class="quotes-header">
+                <p class="quotes-label">Supporting Quotes</p>
+                <router-link to="/demo-transcripts" class="quotes-link">See sample transcripts</router-link>
+              </div>
+              <div class="quotes-container">
+                <div class="quote-item">
+                  <p class="quote-text">"Mostly online, but if it's a foundation, I sometimes go in-store first to check the shade. For everything else, online is easiest."</p>
+                  <p class="quote-source">Estée Lauder customer, Japan</p>
+                </div>
+                <div class="quote-item">
+                  <p class="quote-text">"I love going to the brand boutique or the department store corner. The experience feels special, and I get advice on shades or textures. But I also order online when I'm restocking something I already know works for me."</p>
+                  <p class="quote-source">Lancôme customer, France</p>
+                </div>
+                <div class="quote-item">
+                  <p class="quote-text">"Always online. Literally always. I think the last time I bought something in-store was pre-pandemic."</p>
+                  <p class="quote-source">Shiseido customer, United States</p>
+                </div>
+              </div>
             </div>
           </template>
         </Card>
@@ -292,6 +372,26 @@
                 </template>
               </Card>
             </div>
+            <div class="quotes-section">
+              <div class="quotes-header">
+                <p class="quotes-label">Supporting Quotes</p>
+                <router-link to="/demo-transcripts" class="quotes-link">See sample transcripts</router-link>
+              </div>
+              <div class="quotes-container">
+                <div class="quote-item">
+                  <p class="quote-text">"Skincare and makeup, mostly. I still use the serum, and I also use a foundation from them that sits really well on camera. Their fragrance line is nice too, but I rotate that more."</p>
+                  <p class="quote-source">Estée Lauder customer, Japan</p>
+                </div>
+                <div class="quote-item">
+                  <p class="quote-text">"Makeup and fragrance, 100%. I use skincare too, but if you open my bathroom cabinet, you'll see a lot of lipsticks, mascara, and at least two perfumes from Lancôme. It's very much a 'color and scent' brand for me."</p>
+                  <p class="quote-source">Lancôme customer, France</p>
+                </div>
+                <div class="quote-item">
+                  <p class="quote-text">"Skincare and sun care. Makeup not as much — although I do like some of their foundations. But sunscreen is the big one for me."</p>
+                  <p class="quote-source">Shiseido customer, United States</p>
+                </div>
+              </div>
+            </div>
           </template>
         </Card>
       </div>
@@ -329,6 +429,26 @@
                   />
                 </template>
               </Card>
+            </div>
+            <div class="quotes-section">
+              <div class="quotes-header">
+                <p class="quotes-label">Supporting Quotes</p>
+                <router-link to="/demo-transcripts" class="quotes-link">See sample transcripts</router-link>
+              </div>
+              <div class="quotes-container">
+                <div class="quote-item">
+                  <p class="quote-text">"I'd love a collaboration where I can talk deeply about product benefits — like a skincare series showing real progress. Paid posts are important, but I'd also enjoy co-creation opportunities around educational content."</p>
+                  <p class="quote-source">Estée Lauder customer, Japan</p>
+                </div>
+                <div class="quote-item">
+                  <p class="quote-text">"Long-term ambassadorship. I'd love to be part of a group of smaller creators that they work with regularly, not just once. Paid posts are important for me because creating content takes a lot of time, but I'm also very interested in being invited to brand events."</p>
+                  <p class="quote-source">Lancôme customer, Japan</p>
+                </div>
+                <div class="quote-item">
+                  <p class="quote-text">"Something ongoing. Not just a one-off. And something where I don't have to pretend — I want room to be honest. Also: early access to sun care launches. PLEASE. It would make my whole year."</p>
+                  <p class="quote-source">Shiseido customer, United States</p>
+                </div>
+              </div>
             </div>
           </template>
         </Card>
@@ -2127,6 +2247,73 @@ const collaborationInterestOptions = ref({
   line-height: 1.5;
 }
 
+/* Quotes Section */
+.quotes-section {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.quotes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.quotes-label {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6348ed;
+  font-weight: 600;
+  margin: 0;
+}
+
+.quotes-link {
+  font-size: 14px;
+  color: #6348ed;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.quotes-link:hover {
+  color: #4c39d1;
+  text-decoration: underline;
+}
+
+.quotes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.quote-item {
+  padding: 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  border-left: 3px solid #6348ed;
+}
+
+.quote-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #1f2937;
+  margin: 0 0 12px 0;
+  font-style: italic;
+}
+
+.quote-source {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+}
+
 /* Small charts in brief section */
 .brief-chart {
   height: 180px;
@@ -2254,6 +2441,33 @@ const collaborationInterestOptions = ref({
 
   .section-insight {
     font-size: 18px;
+  }
+
+  .quotes-section {
+    margin-top: 32px;
+    padding-top: 24px;
+  }
+
+  .quotes-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .quotes-link {
+    font-size: 13px;
+  }
+
+  .quote-item {
+    padding: 16px;
+  }
+
+  .quote-text {
+    font-size: 14px;
+  }
+
+  .quote-source {
+    font-size: 12px;
   }
 }
 </style>
