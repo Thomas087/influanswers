@@ -208,6 +208,44 @@
           </template>
         </Card>
       </div>
+
+      <!-- Product Categories Section -->
+      <div class="report-section">
+        <Card class="question-section-card">
+          <template #content>
+            <div class="section-header">
+              <p class="section-insight">{{ reportData.survey.questions.product_categories.title }}</p>
+            </div>
+            <div class="question-text">{{ reportData.survey.questions.product_categories.question_text }}</div>
+            <div class="chart-controls">
+              <SelectButton
+                v-model="selectedCountry"
+                :options="countryOptions"
+                optionLabel="label"
+                optionValue="value"
+                class="country-selector"
+              />
+            </div>
+            <div class="brands-grid">
+              <Card
+                v-for="brand in reportData.report.brands"
+                :key="`categories-${brand}`"
+                class="brand-card"
+              >
+                <template #title>{{ brand }}</template>
+                <template #content>
+                  <Chart
+                    type="bar"
+                    :data="getProductCategoriesDataForBrand(brand)"
+                    :options="productCategoriesOptions"
+                    class="chart-container"
+                  />
+                </template>
+              </Card>
+            </div>
+          </template>
+        </Card>
+      </div>
     </div>
   </div>
 </template>
@@ -578,6 +616,70 @@ const reportData = {
               'Purchase in a brand-owned store': 5,
               'Purchase from a third-party retailer': 4,
               'Receive products through brand gifting or seeding': 1,
+            },
+          },
+        },
+      },
+      product_categories: {
+        title:
+          'Skincare dominates usage across all three brands, with Shiseido showing the strongest sun care adoption. Lancôme and Estée Lauder customers show higher engagement with makeup and fragrance categories.',
+        question_text: 'Which product categories from this brand do you use most frequently?',
+        answers: {
+          JP: {
+            Shiseido: {
+              skincare: 14,
+              makeup: 6,
+              fragrance: 2,
+              'sun care': 10,
+              'body care': 1,
+            },
+            Lancôme: {
+              skincare: 12,
+              makeup: 9,
+              fragrance: 8,
+            },
+            'Estée Lauder': {
+              skincare: 13,
+              makeup: 8,
+              fragrance: 7,
+            },
+          },
+          FR: {
+            Shiseido: {
+              skincare: 13,
+              makeup: 5,
+              fragrance: 3,
+              'sun care': 9,
+              'body care': 1,
+            },
+            Lancôme: {
+              skincare: 11,
+              makeup: 10,
+              fragrance: 9,
+            },
+            'Estée Lauder': {
+              skincare: 12,
+              makeup: 9,
+              fragrance: 8,
+            },
+          },
+          US: {
+            Shiseido: {
+              skincare: 12,
+              makeup: 6,
+              fragrance: 2,
+              'sun care': 11,
+              'body care': 1,
+            },
+            Lancôme: {
+              skincare: 10,
+              makeup: 11,
+              fragrance: 9,
+            },
+            'Estée Lauder': {
+              skincare: 11,
+              makeup: 10,
+              fragrance: 9,
             },
           },
         },
@@ -1108,6 +1210,100 @@ function getProductObtainmentDataForBrand(brand: string) {
 }
 
 const productObtainmentOptions = ref({
+  indexAxis: 'y' as const,
+  plugins: {
+    legend: {
+      display: false,
+    },
+  },
+  scales: {
+    x: {
+      beginAtZero: true,
+      ticks: {
+        stepSize: 2,
+      },
+    },
+  },
+  responsive: true,
+  maintainAspectRatio: false,
+})
+
+// Product Categories Chart - returns data for a specific brand
+function getProductCategoriesDataForBrand(brand: string) {
+  const allCategories = ['skincare', 'makeup', 'fragrance', 'sun care', 'body care']
+
+  const brandIndex = reportData.report.brands.indexOf(brand)
+  const brandColor = ['#6348ed', '#8b5cf6', '#c4b5fd'][brandIndex]
+
+  if (selectedCountry.value === 'Global') {
+    // First, determine which categories exist for this brand by checking any country
+    const sampleCountry = 'JP' as 'JP' | 'FR' | 'US'
+    const brandData = reportData.survey.questions.product_categories.answers[sampleCountry][
+      brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+    ]
+    const availableCategories = allCategories.filter((cat) => brandData[cat as keyof typeof brandData] !== undefined)
+
+    const aggregated: Record<string, number> = {}
+    for (const category of availableCategories) {
+      aggregated[category] = sumNumbers(
+        reportData.report.countries.map((country) => {
+          const countryData = reportData.survey.questions.product_categories.answers[country as 'JP' | 'FR' | 'US'][
+            brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+          ]
+          return (countryData[category as keyof typeof countryData] as number) || 0
+        })
+      )
+    }
+
+    // Sort by value in descending order
+    const sorted = availableCategories
+      .map((category) => [category, aggregated[category]] as [string, number])
+      .filter((item) => item[1] > 0) // Only include categories with data
+      .sort((a, b) => b[1] - a[1])
+
+    return {
+      labels: sorted.map((item) => item[0]),
+      datasets: [
+        {
+          label: brand,
+          data: sorted.map((item) => item[1]),
+          backgroundColor: brandColor,
+        },
+      ],
+    }
+  } else {
+    const country = selectedCountry.value as 'JP' | 'FR' | 'US'
+    const brandData = reportData.survey.questions.product_categories.answers[country][
+      brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+    ]
+
+    // Get available categories for this brand
+    const availableCategories = allCategories.filter((cat) => brandData[cat as keyof typeof brandData] !== undefined)
+
+    const data = availableCategories
+      .map((category) => [
+        category,
+        (brandData[category as keyof typeof brandData] as number) || 0,
+      ] as [string, number])
+      .filter((item) => item[1] > 0) // Only include categories with data
+
+    // Sort by value in descending order
+    const sorted = data.sort((a, b) => b[1] - a[1])
+
+    return {
+      labels: sorted.map((item) => item[0]),
+      datasets: [
+        {
+          label: brand,
+          data: sorted.map((item) => item[1]),
+          backgroundColor: brandColor,
+        },
+      ],
+    }
+  }
+}
+
+const productCategoriesOptions = ref({
   indexAxis: 'y' as const,
   plugins: {
     legend: {
