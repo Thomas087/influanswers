@@ -95,57 +95,72 @@
         </div>
       </div>
 
-      <!-- Report Sections Grid - 2 columns on laptop -->
-      <div class="report-grid">
-        <!-- Purchase Drivers -->
-        <Card class="report-card">
-          <template #title>
-            Purchase Drivers
-            <p class="chart-subtitle">{{ reportData.survey.questions.purchase_drivers.title }}</p>
-          </template>
-          <template #content>
-            <div class="chart-controls">
-              <SelectButton
-                v-model="selectedCountry"
-                :options="countryOptions"
-                optionLabel="label"
-                optionValue="value"
-                class="country-selector"
+      <!-- Purchase Drivers Section -->
+      <div class="report-section">
+        <div class="section-header">
+          <h2 class="section-title">Purchase Drivers</h2>
+          <p class="section-subtitle">{{ reportData.survey.questions.purchase_drivers.title }}</p>
+        </div>
+        <div class="chart-controls">
+          <SelectButton
+            v-model="selectedCountry"
+            :options="countryOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="country-selector"
+          />
+        </div>
+        <div class="brands-grid">
+          <Card
+            v-for="brand in reportData.report.brands"
+            :key="`purchase-${brand}`"
+            class="brand-card"
+          >
+            <template #title>{{ brand }}</template>
+            <template #content>
+              <Chart
+                type="bar"
+                :data="getPurchaseDriversDataForBrand(brand)"
+                :options="purchaseDriversOptions"
+                class="chart-container"
               />
-            </div>
-            <Chart
-              type="bar"
-              :data="purchaseDriversChartData"
-              :options="purchaseDriversOptions"
-              class="chart-container"
-            />
-          </template>
-        </Card>
+            </template>
+          </Card>
+        </div>
+      </div>
 
-        <!-- Other Brands Purchased -->
-        <Card class="report-card">
-          <template #title>
-            Other Brands Purchased
-            <p class="chart-subtitle">{{ reportData.survey.questions.other_brands_purchased.title }}</p>
-          </template>
-          <template #content>
-            <div class="chart-controls">
-              <SelectButton
-                v-model="selectedCountry"
-                :options="countryOptions"
-                optionLabel="label"
-                optionValue="value"
-                class="country-selector"
+      <!-- Other Brands Purchased Section -->
+      <div class="report-section">
+        <div class="section-header">
+          <h2 class="section-title">Other Brands Purchased</h2>
+          <p class="section-subtitle">{{ reportData.survey.questions.other_brands_purchased.title }}</p>
+        </div>
+        <div class="chart-controls">
+          <SelectButton
+            v-model="selectedCountry"
+            :options="countryOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="country-selector"
+          />
+        </div>
+        <div class="brands-grid">
+          <Card
+            v-for="brand in reportData.report.brands"
+            :key="`brands-${brand}`"
+            class="brand-card"
+          >
+            <template #title>{{ brand }}</template>
+            <template #content>
+              <Chart
+                type="bar"
+                :data="getOtherBrandsDataForBrand(brand)"
+                :options="otherBrandsOptions"
+                class="chart-container"
               />
-            </div>
-            <Chart
-              type="bar"
-              :data="otherBrandsChartData"
-              :options="otherBrandsOptions"
-              class="chart-container"
-            />
-          </template>
-        </Card>
+            </template>
+          </Card>
+        </div>
       </div>
     </div>
   </div>
@@ -745,9 +760,8 @@ const followerCountPieOptions = ref({
   maintainAspectRatio: false,
 })
 
-// Purchase Drivers Chart
-const purchaseDriversChartData = computed(() => {
-  const brands = reportData.report.brands
+// Purchase Drivers Chart - returns data for a specific brand
+function getPurchaseDriversDataForBrand(brand: string) {
   const drivers = [
     'Scientific proof of efficacy',
     'Influencer recommendations',
@@ -759,58 +773,68 @@ const purchaseDriversChartData = computed(() => {
     'Convenience and availability',
   ]
 
+  const brandIndex = reportData.report.brands.indexOf(brand)
+  const brandColor = ['#6348ed', '#8b5cf6', '#c4b5fd'][brandIndex]
+
   if (selectedCountry.value === 'Global') {
-    const aggregated: Record<string, Record<string, number>> = {}
-    for (const brand of brands) {
-      aggregated[brand] = {}
-      for (const driver of drivers) {
-        aggregated[brand][driver] = sumNumbers(
-          reportData.report.countries.map((country) => {
-            return (
-              reportData.survey.questions.purchase_drivers.answers[country as 'JP' | 'FR' | 'US'][
-                brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
-              ][driver as keyof typeof reportData.survey.questions.purchase_drivers.answers.JP.Shiseido] as number
-            )
-          })
-        )
-      }
+    const aggregated: Record<string, number> = {}
+    for (const driver of drivers) {
+      aggregated[driver] = sumNumbers(
+        reportData.report.countries.map((country) => {
+          return (
+            reportData.survey.questions.purchase_drivers.answers[country as 'JP' | 'FR' | 'US'][
+              brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+            ][driver as keyof typeof reportData.survey.questions.purchase_drivers.answers.JP.Shiseido] as number
+          )
+        })
+      )
     }
 
+    // Sort by value in descending order
+    const sorted = drivers
+      .map((driver) => [driver, aggregated[driver]] as [string, number])
+      .sort((a, b) => b[1] - a[1])
+
     return {
-      labels: drivers,
-      datasets: brands.map((brand, index) => ({
-        label: brand,
-        data: drivers.map((driver) => aggregated[brand][driver]),
-        backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'][index],
-      })),
+      labels: sorted.map((item) => item[0]),
+      datasets: [
+        {
+          label: brand,
+          data: sorted.map((item) => item[1]),
+          backgroundColor: brandColor,
+        },
+      ],
     }
   } else {
     const country = selectedCountry.value as 'JP' | 'FR' | 'US'
+    const data = drivers.map((driver) => [
+      driver,
+      reportData.survey.questions.purchase_drivers.answers[country][
+        brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+      ][driver as keyof typeof reportData.survey.questions.purchase_drivers.answers.JP.Shiseido] as number,
+    ] as [string, number])
+
+    // Sort by value in descending order
+    const sorted = data.sort((a, b) => b[1] - a[1])
+
     return {
-      labels: drivers,
-      datasets: brands.map((brand, index) => ({
-        label: brand,
-        data: drivers.map(
-          (driver) =>
-            reportData.survey.questions.purchase_drivers.answers[country][
-              brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
-            ][driver as keyof typeof reportData.survey.questions.purchase_drivers.answers.JP.Shiseido] as number
-        ),
-        backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'][index],
-      })),
+      labels: sorted.map((item) => item[0]),
+      datasets: [
+        {
+          label: brand,
+          data: sorted.map((item) => item[1]),
+          backgroundColor: brandColor,
+        },
+      ],
     }
   }
-})
+}
 
 const purchaseDriversOptions = ref({
   indexAxis: 'y' as const,
   plugins: {
     legend: {
-      position: 'bottom' as const,
-      labels: {
-        usePointStyle: true,
-        padding: 15,
-      },
+      display: false,
     },
   },
   scales: {
@@ -825,10 +849,9 @@ const purchaseDriversOptions = ref({
   maintainAspectRatio: false,
 })
 
-// Other Brands Purchased Chart
-const otherBrandsChartData = computed(() => {
-  const brands = reportData.report.brands
-  const otherBrands = [
+// Other Brands Purchased Chart - returns data for a specific brand
+function getOtherBrandsDataForBrand(brand: string) {
+  const allBrands = [
     'Shiseido',
     'Lancôme',
     'Estée Lauder',
@@ -842,58 +865,71 @@ const otherBrandsChartData = computed(() => {
     'La Roche-Posay',
   ]
 
+  // Filter out the current brand from the list
+  const otherBrands = allBrands.filter((b) => b !== brand)
+
+  const brandIndex = reportData.report.brands.indexOf(brand)
+  const brandColor = ['#6348ed', '#8b5cf6', '#c4b5fd'][brandIndex]
+
   if (selectedCountry.value === 'Global') {
-    const aggregated: Record<string, Record<string, number>> = {}
-    for (const brand of brands) {
-      aggregated[brand] = {}
-      for (const otherBrand of otherBrands) {
-        aggregated[brand][otherBrand] = sumNumbers(
-          reportData.report.countries.map((country) => {
-            return (
-              reportData.survey.questions.other_brands_purchased.answers[country as 'JP' | 'FR' | 'US'][
-                brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
-              ][otherBrand as keyof typeof reportData.survey.questions.other_brands_purchased.answers.JP.Shiseido] as number
-            )
-          })
-        )
-      }
+    const aggregated: Record<string, number> = {}
+    for (const otherBrand of otherBrands) {
+      aggregated[otherBrand] = sumNumbers(
+        reportData.report.countries.map((country) => {
+          return (
+            reportData.survey.questions.other_brands_purchased.answers[country as 'JP' | 'FR' | 'US'][
+              brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+            ][otherBrand as keyof typeof reportData.survey.questions.other_brands_purchased.answers.JP.Shiseido] as number
+          )
+        })
+      )
     }
 
+    // Sort by value in descending order
+    const sorted = otherBrands
+      .map((otherBrand) => [otherBrand, aggregated[otherBrand]] as [string, number])
+      .sort((a, b) => b[1] - a[1])
+
     return {
-      labels: otherBrands,
-      datasets: brands.map((brand, index) => ({
-        label: brand,
-        data: otherBrands.map((otherBrand) => aggregated[brand][otherBrand]),
-        backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'][index],
-      })),
+      labels: sorted.map((item) => item[0]),
+      datasets: [
+        {
+          label: brand,
+          data: sorted.map((item) => item[1]),
+          backgroundColor: brandColor,
+        },
+      ],
     }
   } else {
     const country = selectedCountry.value as 'JP' | 'FR' | 'US'
+    const data = otherBrands.map((otherBrand) => [
+      otherBrand,
+      reportData.survey.questions.other_brands_purchased.answers[country][
+        brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+      ][otherBrand as keyof typeof reportData.survey.questions.other_brands_purchased.answers.JP.Shiseido] as number,
+    ] as [string, number])
+
+    // Sort by value in descending order
+    const sorted = data.sort((a, b) => b[1] - a[1])
+
     return {
-      labels: otherBrands,
-      datasets: brands.map((brand, index) => ({
-        label: brand,
-        data: otherBrands.map(
-          (otherBrand) =>
-            reportData.survey.questions.other_brands_purchased.answers[country][
-              brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
-            ][otherBrand as keyof typeof reportData.survey.questions.other_brands_purchased.answers.JP.Shiseido] as number
-        ),
-        backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'][index],
-      })),
+      labels: sorted.map((item) => item[0]),
+      datasets: [
+        {
+          label: brand,
+          data: sorted.map((item) => item[1]),
+          backgroundColor: brandColor,
+        },
+      ],
     }
   }
-})
+}
 
 const otherBrandsOptions = ref({
   indexAxis: 'y' as const,
   plugins: {
     legend: {
-      position: 'bottom' as const,
-      labels: {
-        usePointStyle: true,
-        padding: 15,
-      },
+      display: false,
     },
   },
   scales: {
@@ -1050,14 +1086,38 @@ const otherBrandsOptions = ref({
   line-height: 1;
 }
 
-.report-grid {
+/* Report Sections */
+.report-section {
+  margin-top: 48px;
+}
+
+.section-header {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.section-subtitle {
+  font-size: 15px;
+  font-weight: 400;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.brands-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
-  margin-top: 32px;
+  margin-top: 24px;
 }
 
-.report-card {
+.brand-card {
   height: 100%;
 }
 
@@ -1105,10 +1165,10 @@ const otherBrandsOptions = ref({
   font-size: 12px;
 }
 
-/* Laptop and larger screens - 2 columns */
+/* Laptop and larger screens - 3 columns */
 @media (min-width: 1024px) {
-  .report-grid {
-    grid-template-columns: 1fr 1fr;
+  .brands-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .brief-section-content {
@@ -1131,12 +1191,20 @@ const otherBrandsOptions = ref({
   .report-subtitle {
     font-size: 24px;
   }
+
+  .section-title {
+    font-size: 32px;
+  }
 }
 
 /* Tablet */
 @media (min-width: 768px) and (max-width: 1023px) {
   .brief-section {
     padding: 32px 24px;
+  }
+
+  .brands-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
