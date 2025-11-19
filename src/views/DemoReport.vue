@@ -15,7 +15,6 @@
           <div class="brief-column">
             <div class="brief-item">
               <p class="brief-label">Report Overview</p>
-              <h3 class="brief-title">Context & Objectives</h3>
               <p class="brief-text">
                 {{ reportData.report.description }}
               </p>
@@ -23,7 +22,6 @@
 
             <div class="brief-item">
               <p class="brief-label">Coverage</p>
-              <h3 class="brief-title">Brands & Markets</h3>
               <div class="brief-details">
                 <div class="brief-detail-row">
                   <span class="brief-detail-label">Brands:</span>
@@ -43,13 +41,26 @@
                 </div>
               </div>
             </div>
+
+            <div class="brief-item">
+              <p class="brief-label">Survey Questions</p>
+              <div class="questions-container">
+                <div
+                  v-for="(question, index) in surveyQuestions"
+                  :key="index"
+                  class="question-item"
+                >
+                  <span class="question-number">{{ index + 1 }}</span>
+                  <span class="question-text">{{ question }}</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Right Column -->
           <div class="brief-column">
             <div class="brief-item">
               <p class="brief-label">Respondent Profile</p>
-              <h3 class="brief-title">Demographics</h3>
               <div class="brief-details">
                 <div class="brief-detail-group">
                   <div class="chart-controls-small">
@@ -946,6 +957,19 @@ const countryOptions = [
 // Computed total respondents
 const totalRespondents = computed(() => {
   return reportData.report.countries.length * reportData.report.brands.length * 20
+})
+
+// Computed list of all questions in the correct order
+const surveyQuestions = computed(() => {
+  const questionOrder = [
+    'purchase_drivers',
+    'product_launch_awareness',
+    'other_brands_purchased',
+    'product_obtainment',
+    'product_categories',
+    'collaboration_interest',
+  ]
+  return questionOrder.map((key) => reportData.survey.questions[key as keyof typeof reportData.survey.questions].question_text)
 })
 
 // Helper to sum numbers
@@ -1882,6 +1906,47 @@ const collaborationInterestOptions = ref({
   color: #6348ed;
   font-weight: 600;
   line-height: 1;
+}
+
+.questions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.question-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.question-number {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #6348ed;
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.question-item .question-text {
+  flex: 1;
+  font-size: 15px;
+  color: #1f2937;
+  line-height: 1.45;
+  margin: 0;
+  text-align: left;
 }
 
 /* Report Sections */
