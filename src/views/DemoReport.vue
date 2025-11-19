@@ -52,26 +52,42 @@
               <h3 class="brief-title">Demographics</h3>
               <div class="brief-details">
                 <div class="brief-detail-group">
+                  <div class="chart-controls-small">
+                    <SelectButton
+                      v-model="selectedCountry"
+                      :options="countryOptions"
+                      optionLabel="label"
+                      optionValue="value"
+                      class="country-selector-small"
+                    />
+                  </div>
+                </div>
+                <div class="brief-detail-group">
                   <p class="brief-detail-label">Age Distribution</p>
-                  <ul class="brief-list">
-                    <li>18-24 years</li>
-                    <li>25-34 years</li>
-                    <li>35-44 years</li>
-                  </ul>
+                  <Chart
+                    type="pie"
+                    :data="ageDistributionPieData"
+                    :options="ageDistributionPieOptions"
+                    class="brief-chart"
+                  />
+                </div>
+                <div class="brief-detail-group">
+                  <p class="brief-detail-label">Gender Distribution</p>
+                  <Chart
+                    type="pie"
+                    :data="genderDistributionPieData"
+                    :options="genderDistributionPieOptions"
+                    class="brief-chart"
+                  />
                 </div>
                 <div class="brief-detail-group">
                   <p class="brief-detail-label">Follower Count</p>
-                  <ul class="brief-list">
-                    <li>&lt;1,000 followers</li>
-                    <li>1,000-5,000 followers</li>
-                    <li>5,000-10,000 followers</li>
-                  </ul>
-                </div>
-                <div class="brief-detail-group">
-                  <p class="brief-detail-label">Gender</p>
-                  <ul class="brief-list">
-                    <li>Female, Male, Other/No answer</li>
-                  </ul>
+                  <Chart
+                    type="pie"
+                    :data="followerCountPieData"
+                    :options="followerCountPieOptions"
+                    class="brief-chart"
+                  />
                 </div>
               </div>
             </div>
@@ -81,72 +97,6 @@
 
       <!-- Report Sections Grid - 2 columns on laptop -->
       <div class="report-grid">
-        <!-- Demographics: Age Distribution -->
-        <Card class="report-card">
-          <template #title>Age Distribution</template>
-          <template #content>
-            <div class="chart-controls">
-              <SelectButton
-                v-model="selectedCountry"
-                :options="countryOptions"
-                optionLabel="label"
-                optionValue="value"
-                class="country-selector"
-              />
-            </div>
-            <Chart
-              type="bar"
-              :data="ageDistributionChartData"
-              :options="ageDistributionOptions"
-              class="chart-container"
-            />
-          </template>
-        </Card>
-
-        <!-- Demographics: Gender Distribution -->
-        <Card class="report-card">
-          <template #title>Gender Distribution</template>
-          <template #content>
-            <div class="chart-controls">
-              <SelectButton
-                v-model="selectedCountry"
-                :options="countryOptions"
-                optionLabel="label"
-                optionValue="value"
-                class="country-selector"
-              />
-            </div>
-            <Chart
-              type="bar"
-              :data="genderDistributionChartData"
-              :options="genderDistributionOptions"
-              class="chart-container"
-            />
-          </template>
-        </Card>
-
-        <!-- Demographics: Follower Count Distribution -->
-        <Card class="report-card">
-          <template #title>Follower Count Distribution</template>
-          <template #content>
-            <div class="chart-controls">
-              <SelectButton
-                v-model="selectedCountry"
-                :options="countryOptions"
-                optionLabel="label"
-                optionValue="value"
-                class="country-selector"
-              />
-            </div>
-            <Chart
-              type="bar"
-              :data="followerCountChartData"
-              :options="followerCountOptions"
-              class="chart-container"
-            />
-          </template>
-        </Card>
-
         <!-- Purchase Drivers -->
         <Card class="report-card">
           <template #title>
@@ -543,18 +493,19 @@ function sumNumbers(numbers: number[]): number {
   return numbers.reduce((a, b) => a + b, 0)
 }
 
-// Age Distribution Chart
-const ageDistributionChartData = computed(() => {
+// Age Distribution Pie Chart - aggregated across all brands
+const ageDistributionPieData = computed(() => {
   const ageGroups = ['18-24', '25-34', '35-44']
+  const ageLabels = ['18-24', '25-34', '35-44']
   const brands = reportData.report.brands
 
   if (selectedCountry.value === 'Global') {
-    // Aggregate across all countries
-    const aggregated: Record<string, Record<string, number>> = {}
-    for (const brand of brands) {
-      aggregated[brand] = {}
-      for (const age of ageGroups) {
-        aggregated[brand][age] = sumNumbers(
+    // Aggregate across all countries and all brands
+    const aggregated: Record<string, number> = {}
+    for (const age of ageGroups) {
+      aggregated[age] = 0
+      for (const brand of brands) {
+        aggregated[age] += sumNumbers(
           reportData.report.countries.map((country) => {
             return reportData.report.demographics.age_distribution[country as 'JP' | 'FR' | 'US'][
               brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
@@ -565,50 +516,60 @@ const ageDistributionChartData = computed(() => {
     }
 
     return {
-      labels: ageGroups,
-      datasets: brands.map((brand, index) => ({
-        label: brand,
-        data: ageGroups.map((age) => aggregated[brand][age]),
-        backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'][index],
-      })),
+      labels: ageLabels,
+      datasets: [
+        {
+          data: ageGroups.map((age) => aggregated[age]),
+          backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'],
+          borderWidth: 0,
+        },
+      ],
     }
   } else {
     const country = selectedCountry.value as 'JP' | 'FR' | 'US'
+    const aggregated: Record<string, number> = {}
+    for (const age of ageGroups) {
+      aggregated[age] = 0
+      for (const brand of brands) {
+        aggregated[age] +=
+          reportData.report.demographics.age_distribution[country][
+            brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+          ][age as '18-24' | '25-34' | '35-44']
+      }
+    }
+
     return {
-      labels: ageGroups,
-      datasets: brands.map((brand, index) => ({
-        label: brand,
-        data: ageGroups.map(
-          (age) =>
-            reportData.report.demographics.age_distribution[country][
-              brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
-            ][age as '18-24' | '25-34' | '35-44']
-        ),
-        backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'][index],
-      })),
+      labels: ageLabels,
+      datasets: [
+        {
+          data: ageGroups.map((age) => aggregated[age]),
+          backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'],
+          borderWidth: 0,
+        },
+      ],
     }
   }
 })
 
-const ageDistributionOptions = ref({
+const ageDistributionPieOptions = ref({
   plugins: {
     legend: {
       position: 'bottom' as const,
       labels: {
         usePointStyle: true,
-        padding: 15,
+        padding: 10,
+        font: {
+          size: 11,
+        },
       },
     },
-  },
-  scales: {
-    x: {
-      stacked: true,
-    },
-    y: {
-      stacked: true,
-      beginAtZero: true,
-      ticks: {
-        stepSize: 5,
+    tooltip: {
+      callbacks: {
+        label: function (context: any) {
+          const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
+          const percentage = ((context.parsed / total) * 100).toFixed(1)
+          return context.label + ': ' + context.parsed + ' (' + percentage + '%)'
+        },
       },
     },
   },
@@ -616,18 +577,18 @@ const ageDistributionOptions = ref({
   maintainAspectRatio: false,
 })
 
-// Gender Distribution Chart
-const genderDistributionChartData = computed(() => {
+// Gender Distribution Pie Chart - aggregated across all brands
+const genderDistributionPieData = computed(() => {
   const genders = ['female', 'male', 'other/no_answer']
   const genderLabels = ['Female', 'Male', 'Other/No answer']
   const brands = reportData.report.brands
 
   if (selectedCountry.value === 'Global') {
-    const aggregated: Record<string, Record<string, number>> = {}
-    for (const brand of brands) {
-      aggregated[brand] = {}
-      for (const gender of genders) {
-        aggregated[brand][gender] = sumNumbers(
+    const aggregated: Record<string, number> = {}
+    for (const gender of genders) {
+      aggregated[gender] = 0
+      for (const brand of brands) {
+        aggregated[gender] += sumNumbers(
           reportData.report.countries.map((country) => {
             return reportData.report.demographics.gender_distribution[country as 'JP' | 'FR' | 'US'][
               brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
@@ -639,49 +600,59 @@ const genderDistributionChartData = computed(() => {
 
     return {
       labels: genderLabels,
-      datasets: brands.map((brand, index) => ({
-        label: brand,
-        data: genders.map((gender) => aggregated[brand][gender]),
-        backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'][index],
-      })),
+      datasets: [
+        {
+          data: genders.map((gender) => aggregated[gender]),
+          backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'],
+          borderWidth: 0,
+        },
+      ],
     }
   } else {
     const country = selectedCountry.value as 'JP' | 'FR' | 'US'
+    const aggregated: Record<string, number> = {}
+    for (const gender of genders) {
+      aggregated[gender] = 0
+      for (const brand of brands) {
+        aggregated[gender] +=
+          reportData.report.demographics.gender_distribution[country][
+            brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+          ][gender as 'female' | 'male' | 'other/no_answer']
+      }
+    }
+
     return {
       labels: genderLabels,
-      datasets: brands.map((brand, index) => ({
-        label: brand,
-        data: genders.map(
-          (gender) =>
-            reportData.report.demographics.gender_distribution[country][
-              brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
-            ][gender as 'female' | 'male' | 'other/no_answer']
-        ),
-        backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'][index],
-      })),
+      datasets: [
+        {
+          data: genders.map((gender) => aggregated[gender]),
+          backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'],
+          borderWidth: 0,
+        },
+      ],
     }
   }
 })
 
-const genderDistributionOptions = ref({
+const genderDistributionPieOptions = ref({
   plugins: {
     legend: {
       position: 'bottom' as const,
       labels: {
         usePointStyle: true,
-        padding: 15,
+        padding: 10,
+        font: {
+          size: 11,
+        },
       },
     },
-  },
-  scales: {
-    x: {
-      stacked: true,
-    },
-    y: {
-      stacked: true,
-      beginAtZero: true,
-      ticks: {
-        stepSize: 5,
+    tooltip: {
+      callbacks: {
+        label: function (context: any) {
+          const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
+          const percentage = ((context.parsed / total) * 100).toFixed(1)
+          return context.label + ': ' + context.parsed + ' (' + percentage + '%)'
+        },
       },
     },
   },
@@ -689,18 +660,18 @@ const genderDistributionOptions = ref({
   maintainAspectRatio: false,
 })
 
-// Follower Count Distribution Chart
-const followerCountChartData = computed(() => {
+// Follower Count Distribution Pie Chart - aggregated across all brands
+const followerCountPieData = computed(() => {
   const ranges = ['<1000', '1000-5000', '5000-10000']
   const rangeLabels = ['<1,000', '1,000-5,000', '5,000-10,000']
   const brands = reportData.report.brands
 
   if (selectedCountry.value === 'Global') {
-    const aggregated: Record<string, Record<string, number>> = {}
-    for (const brand of brands) {
-      aggregated[brand] = {}
-      for (const range of ranges) {
-        aggregated[brand][range] = sumNumbers(
+    const aggregated: Record<string, number> = {}
+    for (const range of ranges) {
+      aggregated[range] = 0
+      for (const brand of brands) {
+        aggregated[range] += sumNumbers(
           reportData.report.countries.map((country) => {
             return reportData.report.demographics.follower_count_distribution[
               country as 'JP' | 'FR' | 'US'
@@ -714,49 +685,59 @@ const followerCountChartData = computed(() => {
 
     return {
       labels: rangeLabels,
-      datasets: brands.map((brand, index) => ({
-        label: brand,
-        data: ranges.map((range) => aggregated[brand][range]),
-        backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'][index],
-      })),
+      datasets: [
+        {
+          data: ranges.map((range) => aggregated[range]),
+          backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'],
+          borderWidth: 0,
+        },
+      ],
     }
   } else {
     const country = selectedCountry.value as 'JP' | 'FR' | 'US'
+    const aggregated: Record<string, number> = {}
+    for (const range of ranges) {
+      aggregated[range] = 0
+      for (const brand of brands) {
+        aggregated[range] +=
+          reportData.report.demographics.follower_count_distribution[country][
+            brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+          ][range as '<1000' | '1000-5000' | '5000-10000']
+      }
+    }
+
     return {
       labels: rangeLabels,
-      datasets: brands.map((brand, index) => ({
-        label: brand,
-        data: ranges.map(
-          (range) =>
-            reportData.report.demographics.follower_count_distribution[country][
-              brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
-            ][range as '<1000' | '1000-5000' | '5000-10000']
-        ),
-        backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'][index],
-      })),
+      datasets: [
+        {
+          data: ranges.map((range) => aggregated[range]),
+          backgroundColor: ['#6348ed', '#8b5cf6', '#c4b5fd'],
+          borderWidth: 0,
+        },
+      ],
     }
   }
 })
 
-const followerCountOptions = ref({
+const followerCountPieOptions = ref({
   plugins: {
     legend: {
       position: 'bottom' as const,
       labels: {
         usePointStyle: true,
-        padding: 15,
+        padding: 10,
+        font: {
+          size: 11,
+        },
       },
     },
-  },
-  scales: {
-    x: {
-      stacked: true,
-    },
-    y: {
-      stacked: true,
-      beginAtZero: true,
-      ticks: {
-        stepSize: 5,
+    tooltip: {
+      callbacks: {
+        label: function (context: any) {
+          const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
+          const percentage = ((context.parsed / total) * 100).toFixed(1)
+          return context.label + ': ' + context.parsed + ' (' + percentage + '%)'
+        },
       },
     },
   },
@@ -1103,6 +1084,27 @@ const otherBrandsOptions = ref({
   line-height: 1.5;
 }
 
+/* Small charts in brief section */
+.brief-chart {
+  height: 180px;
+  margin-top: 8px;
+}
+
+.chart-controls-small {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+
+.country-selector-small {
+  font-size: 12px;
+}
+
+.country-selector-small :deep(.p-button) {
+  padding: 0.4rem 0.6rem;
+  font-size: 12px;
+}
+
 /* Laptop and larger screens - 2 columns */
 @media (min-width: 1024px) {
   .report-grid {
@@ -1167,6 +1169,15 @@ const otherBrandsOptions = ref({
 
   .country-selector {
     font-size: 12px;
+  }
+
+  .brief-chart {
+    height: 160px;
+  }
+
+  .country-selector-small :deep(.p-button) {
+    padding: 0.3rem 0.5rem;
+    font-size: 11px;
   }
 }
 </style>
