@@ -338,11 +338,112 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import Header from '../components/Header.vue'
 import Card from 'primevue/card'
 import Chart from 'primevue/chart'
 import SelectButton from 'primevue/selectbutton'
+
+const route = useRoute()
+
+// OpenGraph meta tags
+const ogTitle = 'Micro-Influencer Perception Report - Shiseido, Lancôme, and Estée Lauder'
+const ogDescription =
+  'Comprehensive analysis of brand perception among micro-influencers across Japan, France, and the United States. Insights on purchase drivers, product categories, collaboration interests, and more.'
+const ogUrl = computed(() => {
+  return 'https://senvio.app' + route.path
+})
+const ogImage = 'https://senvio.app/img/market-research-1200.jpg'
+
+// Function to update or create meta tag
+function updateMetaTag(property: string, content: string, isProperty = true) {
+  const attribute = isProperty ? 'property' : 'name'
+  let meta = document.querySelector(`meta[${attribute}="${property}"]`) as HTMLMetaElement
+  if (!meta) {
+    meta = document.createElement('meta')
+    meta.setAttribute(attribute, property)
+    document.head.appendChild(meta)
+  }
+  meta.setAttribute('content', content)
+}
+
+// Function to update title
+function updateTitle(title: string) {
+  document.title = title
+  updateMetaTag('title', title, false)
+}
+
+// Store original meta tags to restore on unmount
+const originalMetaTags: { [key: string]: { content: string | null; attr: string } } = {}
+
+onMounted(() => {
+  // Store original values
+  const titleEl = document.querySelector('title')
+  originalMetaTags.title = { content: titleEl?.textContent || null, attr: 'title' }
+
+  const metaTags = [
+    { attr: 'name', value: 'title' },
+    { attr: 'name', value: 'description' },
+    { attr: 'property', value: 'og:type' },
+    { attr: 'property', value: 'og:url' },
+    { attr: 'property', value: 'og:title' },
+    { attr: 'property', value: 'og:description' },
+    { attr: 'property', value: 'og:image' },
+    { attr: 'property', value: 'og:image:width' },
+    { attr: 'property', value: 'og:image:height' },
+    { attr: 'property', value: 'og:site_name' },
+    { attr: 'name', value: 'twitter:card' },
+    { attr: 'name', value: 'twitter:url' },
+    { attr: 'name', value: 'twitter:title' },
+    { attr: 'name', value: 'twitter:description' },
+    { attr: 'name', value: 'twitter:image' },
+  ]
+
+  metaTags.forEach(({ attr, value }) => {
+    const el = document.querySelector(`meta[${attr}="${value}"]`) as HTMLMetaElement
+    originalMetaTags[value] = {
+      content: el?.getAttribute('content') || null,
+      attr: attr,
+    }
+  })
+
+  // Update title
+  updateTitle(ogTitle)
+
+  // Update meta tags
+  updateMetaTag('description', ogDescription, false)
+  updateMetaTag('og:type', 'website', true)
+  updateMetaTag('og:url', ogUrl.value, true)
+  updateMetaTag('og:title', ogTitle, true)
+  updateMetaTag('og:description', ogDescription, true)
+  updateMetaTag('og:image', ogImage, true)
+  updateMetaTag('og:image:width', '1200', true)
+  updateMetaTag('og:image:height', '630', true)
+  updateMetaTag('og:site_name', 'Senvio', true)
+  updateMetaTag('twitter:card', 'summary_large_image', false)
+  updateMetaTag('twitter:url', ogUrl.value, false)
+  updateMetaTag('twitter:title', ogTitle, false)
+  updateMetaTag('twitter:description', ogDescription, false)
+  updateMetaTag('twitter:image', ogImage, false)
+})
+
+onUnmounted(() => {
+  // Restore original title
+  if (originalMetaTags.title?.content) {
+    updateTitle(originalMetaTags.title.content)
+  }
+
+  // Restore original meta tags
+  Object.entries(originalMetaTags).forEach(([key, metaInfo]) => {
+    if (metaInfo.content && key !== 'title') {
+      const meta = document.querySelector(`meta[${metaInfo.attr}="${key}"]`) as HTMLMetaElement
+      if (meta) {
+        meta.setAttribute('content', metaInfo.content)
+      }
+    }
+  })
+})
 
 // Report data
 const reportData = {
