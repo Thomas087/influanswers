@@ -16,6 +16,9 @@
         <a class="nav-link" :href="isHomePage ? '#faq' : '/#faq'">FAQ</a>
       </nav>
       <div class="nav-actions">
+        <router-link to="/demo-report" class="nav-action-link">
+          <Button label="Demo report" severity="secondary" text />
+        </router-link>
         <router-link to="/login" class="nav-action-link">
           <Button label="Login" severity="secondary" outlined />
         </router-link>
@@ -88,6 +91,7 @@ const menuItems = ref<MenuItem[]>([
   { label: 'Pricing', command: () => scrollToSection('pricing') },
   { label: 'FAQ', command: () => scrollToSection('faq') },
   { separator: true },
+  { label: 'Demo report', command: () => navigateTo('/demo-report') },
   { label: 'Login', command: () => navigateTo('/login') },
   { label: 'Write your brief', command: () => navigateTo('/brief') },
 ])
