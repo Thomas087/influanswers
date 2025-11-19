@@ -133,6 +133,44 @@
         </Card>
       </div>
 
+      <!-- Product Launch Awareness Section -->
+      <div class="report-section">
+        <Card class="question-section-card">
+          <template #content>
+            <div class="section-header">
+              <p class="section-insight">{{ reportData.survey.questions.product_launch_awareness.title }}</p>
+            </div>
+            <div class="question-text">{{ reportData.survey.questions.product_launch_awareness.question_text }}</div>
+            <div class="chart-controls">
+              <SelectButton
+                v-model="selectedCountry"
+                :options="countryOptions"
+                optionLabel="label"
+                optionValue="value"
+                class="country-selector"
+              />
+            </div>
+            <div class="brands-grid">
+              <Card
+                v-for="brand in reportData.report.brands"
+                :key="`launch-awareness-${brand}`"
+                class="brand-card"
+              >
+                <template #title>{{ brand }}</template>
+                <template #content>
+                  <Chart
+                    type="bar"
+                    :data="getProductLaunchAwarenessDataForBrand(brand)"
+                    :options="productLaunchAwarenessOptions"
+                    class="chart-container"
+                  />
+                </template>
+              </Card>
+            </div>
+          </template>
+        </Card>
+      </div>
+
       <!-- Other Brands Purchased Section -->
       <div class="report-section">
         <Card class="question-section-card">
@@ -238,6 +276,44 @@
                     type="bar"
                     :data="getProductCategoriesDataForBrand(brand)"
                     :options="productCategoriesOptions"
+                    class="chart-container"
+                  />
+                </template>
+              </Card>
+            </div>
+          </template>
+        </Card>
+      </div>
+
+      <!-- Collaboration Interest Section -->
+      <div class="report-section">
+        <Card class="question-section-card">
+          <template #content>
+            <div class="section-header">
+              <p class="section-insight">{{ reportData.survey.questions.collaboration_interest.title }}</p>
+            </div>
+            <div class="question-text">{{ reportData.survey.questions.collaboration_interest.question_text }}</div>
+            <div class="chart-controls">
+              <SelectButton
+                v-model="selectedCountry"
+                :options="countryOptions"
+                optionLabel="label"
+                optionValue="value"
+                class="country-selector"
+              />
+            </div>
+            <div class="brands-grid">
+              <Card
+                v-for="brand in reportData.report.brands"
+                :key="`collaboration-${brand}`"
+                class="brand-card"
+              >
+                <template #title>{{ brand }}</template>
+                <template #content>
+                  <Chart
+                    type="bar"
+                    :data="getCollaborationInterestDataForBrand(brand)"
+                    :options="collaborationInterestOptions"
                     class="chart-container"
                   />
                 </template>
@@ -680,6 +756,176 @@ const reportData = {
               skincare: 11,
               makeup: 10,
               fragrance: 9,
+            },
+          },
+        },
+      },
+      product_launch_awareness: {
+        title:
+          'Social media ads and influencers are the primary channels for product launch awareness across all brands. In-store consultants show stronger influence in Japan and France, while brand official channels are consistently important across markets.',
+        question_text: 'How do you first hear about new product launches from this brand?',
+        answers: {
+          JP: {
+            Shiseido: {
+              influencers: 5,
+              'social media ads': 6,
+              'friends/family': 2,
+              "brand's official channels": 3,
+              'in-store consultants': 3,
+              'beauty magazines/blogs': 1,
+            },
+            Lancôme: {
+              influencers: 4,
+              'social media ads': 6,
+              'friends/family': 2,
+              "brand's official channels": 3,
+              'in-store consultants': 3,
+              'beauty magazines/blogs': 2,
+            },
+            'Estée Lauder': {
+              influencers: 5,
+              'social media ads': 5,
+              'friends/family': 2,
+              "brand's official channels": 4,
+              'in-store consultants': 2,
+              'beauty magazines/blogs': 2,
+            },
+          },
+          FR: {
+            Shiseido: {
+              influencers: 4,
+              'social media ads': 5,
+              'friends/family': 2,
+              "brand's official channels": 3,
+              'in-store consultants': 4,
+              'beauty magazines/blogs': 2,
+            },
+            Lancôme: {
+              influencers: 3,
+              'social media ads': 5,
+              'friends/family': 2,
+              "brand's official channels": 4,
+              'in-store consultants': 4,
+              'beauty magazines/blogs': 2,
+            },
+            'Estée Lauder': {
+              influencers: 4,
+              'social media ads': 4,
+              'friends/family': 2,
+              "brand's official channels": 4,
+              'in-store consultants': 3,
+              'beauty magazines/blogs': 3,
+            },
+          },
+          US: {
+            Shiseido: {
+              influencers: 5,
+              'social media ads': 6,
+              'friends/family': 3,
+              "brand's official channels": 3,
+              'in-store consultants': 1,
+              'beauty magazines/blogs': 2,
+            },
+            Lancôme: {
+              influencers: 4,
+              'social media ads': 7,
+              'friends/family': 2,
+              "brand's official channels": 3,
+              'in-store consultants': 2,
+              'beauty magazines/blogs': 2,
+            },
+            'Estée Lauder': {
+              influencers: 6,
+              'social media ads': 5,
+              'friends/family': 2,
+              "brand's official channels": 3,
+              'in-store consultants': 1,
+              'beauty magazines/blogs': 3,
+            },
+          },
+        },
+      },
+      collaboration_interest: {
+        title:
+          'Long-term ambassadorship and paid posts are the most sought-after collaboration types across all brands. Early access to new launches and co-creation opportunities show strong interest, particularly for Estée Lauder. Product gifting remains popular as an entry-level collaboration option.',
+        question_text: 'What type of collaboration with this brand would interest you the most?',
+        answers: {
+          JP: {
+            Shiseido: {
+              'product gifting': 4,
+              'paid posts': 5,
+              'long-term ambassadorship': 6,
+              'event invitations': 2,
+              'co-creation opportunities': 2,
+              'early access to new launches': 1,
+            },
+            Lancôme: {
+              'product gifting': 3,
+              'paid posts': 6,
+              'long-term ambassadorship': 5,
+              'event invitations': 2,
+              'co-creation opportunities': 2,
+              'early access to new launches': 2,
+            },
+            'Estée Lauder': {
+              'product gifting': 3,
+              'paid posts': 5,
+              'long-term ambassadorship': 4,
+              'event invitations': 2,
+              'co-creation opportunities': 3,
+              'early access to new launches': 3,
+            },
+          },
+          FR: {
+            Shiseido: {
+              'product gifting': 4,
+              'paid posts': 5,
+              'long-term ambassadorship': 5,
+              'event invitations': 3,
+              'co-creation opportunities': 2,
+              'early access to new launches': 1,
+            },
+            Lancôme: {
+              'product gifting': 3,
+              'paid posts': 6,
+              'long-term ambassadorship': 6,
+              'event invitations': 2,
+              'co-creation opportunities': 2,
+              'early access to new launches': 1,
+            },
+            'Estée Lauder': {
+              'product gifting': 3,
+              'paid posts': 5,
+              'long-term ambassadorship': 4,
+              'event invitations': 2,
+              'co-creation opportunities': 3,
+              'early access to new launches': 3,
+            },
+          },
+          US: {
+            Shiseido: {
+              'product gifting': 3,
+              'paid posts': 6,
+              'long-term ambassadorship': 5,
+              'event invitations': 2,
+              'co-creation opportunities': 2,
+              'early access to new launches': 2,
+            },
+            Lancôme: {
+              'product gifting': 2,
+              'paid posts': 7,
+              'long-term ambassadorship': 5,
+              'event invitations': 2,
+              'co-creation opportunities': 2,
+              'early access to new launches': 2,
+            },
+            'Estée Lauder': {
+              'product gifting': 2,
+              'paid posts': 5,
+              'long-term ambassadorship': 4,
+              'event invitations': 2,
+              'co-creation opportunities': 4,
+              'early access to new launches': 3,
             },
           },
         },
@@ -1315,6 +1561,180 @@ const productCategoriesOptions = ref({
       beginAtZero: true,
       ticks: {
         stepSize: 2,
+      },
+    },
+  },
+  responsive: true,
+  maintainAspectRatio: false,
+})
+
+// Product Launch Awareness Chart - returns data for a specific brand
+function getProductLaunchAwarenessDataForBrand(brand: string) {
+  const options = [
+    'influencers',
+    'social media ads',
+    'friends/family',
+    "brand's official channels",
+    'in-store consultants',
+    'beauty magazines/blogs',
+  ]
+
+  const brandIndex = reportData.report.brands.indexOf(brand)
+  const brandColor = ['#6348ed', '#8b5cf6', '#c4b5fd'][brandIndex]
+
+  if (selectedCountry.value === 'Global') {
+    const aggregated: Record<string, number> = {}
+    for (const option of options) {
+      aggregated[option] = sumNumbers(
+        reportData.report.countries.map((country) => {
+          return (
+            reportData.survey.questions.product_launch_awareness.answers[country as 'JP' | 'FR' | 'US'][
+              brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+            ][option as keyof typeof reportData.survey.questions.product_launch_awareness.answers.JP.Shiseido] as number
+          )
+        })
+      )
+    }
+
+    // Sort by value in descending order
+    const sorted = options
+      .map((option) => [option, aggregated[option]] as [string, number])
+      .sort((a, b) => b[1] - a[1])
+
+    return {
+      labels: sorted.map((item) => item[0]),
+      datasets: [
+        {
+          label: brand,
+          data: sorted.map((item) => item[1]),
+          backgroundColor: brandColor,
+        },
+      ],
+    }
+  } else {
+    const country = selectedCountry.value as 'JP' | 'FR' | 'US'
+    const data = options.map((option) => [
+      option,
+      reportData.survey.questions.product_launch_awareness.answers[country][
+        brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+      ][option as keyof typeof reportData.survey.questions.product_launch_awareness.answers.JP.Shiseido] as number,
+    ] as [string, number])
+
+    // Sort by value in descending order
+    const sorted = data.sort((a, b) => b[1] - a[1])
+
+    return {
+      labels: sorted.map((item) => item[0]),
+      datasets: [
+        {
+          label: brand,
+          data: sorted.map((item) => item[1]),
+          backgroundColor: brandColor,
+        },
+      ],
+    }
+  }
+}
+
+const productLaunchAwarenessOptions = ref({
+  indexAxis: 'y' as const,
+  plugins: {
+    legend: {
+      display: false,
+    },
+  },
+  scales: {
+    x: {
+      beginAtZero: true,
+      ticks: {
+        stepSize: 1,
+      },
+    },
+  },
+  responsive: true,
+  maintainAspectRatio: false,
+})
+
+// Collaboration Interest Chart - returns data for a specific brand
+function getCollaborationInterestDataForBrand(brand: string) {
+  const options = [
+    'product gifting',
+    'paid posts',
+    'long-term ambassadorship',
+    'event invitations',
+    'co-creation opportunities',
+    'early access to new launches',
+  ]
+
+  const brandIndex = reportData.report.brands.indexOf(brand)
+  const brandColor = ['#6348ed', '#8b5cf6', '#c4b5fd'][brandIndex]
+
+  if (selectedCountry.value === 'Global') {
+    const aggregated: Record<string, number> = {}
+    for (const option of options) {
+      aggregated[option] = sumNumbers(
+        reportData.report.countries.map((country) => {
+          return (
+            reportData.survey.questions.collaboration_interest.answers[country as 'JP' | 'FR' | 'US'][
+              brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+            ][option as keyof typeof reportData.survey.questions.collaboration_interest.answers.JP.Shiseido] as number
+          )
+        })
+      )
+    }
+
+    // Sort by value in descending order
+    const sorted = options
+      .map((option) => [option, aggregated[option]] as [string, number])
+      .sort((a, b) => b[1] - a[1])
+
+    return {
+      labels: sorted.map((item) => item[0]),
+      datasets: [
+        {
+          label: brand,
+          data: sorted.map((item) => item[1]),
+          backgroundColor: brandColor,
+        },
+      ],
+    }
+  } else {
+    const country = selectedCountry.value as 'JP' | 'FR' | 'US'
+    const data = options.map((option) => [
+      option,
+      reportData.survey.questions.collaboration_interest.answers[country][
+        brand as 'Shiseido' | 'Lancôme' | 'Estée Lauder'
+      ][option as keyof typeof reportData.survey.questions.collaboration_interest.answers.JP.Shiseido] as number,
+    ] as [string, number])
+
+    // Sort by value in descending order
+    const sorted = data.sort((a, b) => b[1] - a[1])
+
+    return {
+      labels: sorted.map((item) => item[0]),
+      datasets: [
+        {
+          label: brand,
+          data: sorted.map((item) => item[1]),
+          backgroundColor: brandColor,
+        },
+      ],
+    }
+  }
+}
+
+const collaborationInterestOptions = ref({
+  indexAxis: 'y' as const,
+  plugins: {
+    legend: {
+      display: false,
+    },
+  },
+  scales: {
+    x: {
+      beginAtZero: true,
+      ticks: {
+        stepSize: 1,
       },
     },
   },
