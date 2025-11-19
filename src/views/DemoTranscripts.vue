@@ -2,6 +2,13 @@
   <div class="demo-transcripts-page">
     <Header />
     <div class="transcripts-container">
+      <!-- Return Button -->
+      <div class="return-button-container">
+        <router-link to="/demo-report" class="return-link">
+          <Button label="Return to the report" icon="pi pi-arrow-left" severity="secondary" text />
+        </router-link>
+      </div>
+
       <!-- Page Header -->
       <div class="page-header">
         <h1 class="page-title">Demo Transcripts</h1>
@@ -81,6 +88,7 @@ import Header from '../components/Header.vue'
 import Card from 'primevue/card'
 import Tag from 'primevue/tag'
 import SelectButton from 'primevue/selectbutton'
+import Button from 'primevue/button'
 import demoTranscripts from '../data/demo-transcripts.json'
 
 const selectedBrand = ref<string | null>(null)
@@ -141,6 +149,15 @@ const filteredInterviews = computed(() => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 32px 24px;
+}
+
+.return-button-container {
+  margin-bottom: 24px;
+}
+
+.return-link {
+  text-decoration: none;
+  display: inline-block;
 }
 
 .page-header {
