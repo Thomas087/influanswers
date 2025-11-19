@@ -348,9 +348,9 @@ import SelectButton from 'primevue/selectbutton'
 const route = useRoute()
 
 // OpenGraph meta tags
-const ogTitle = 'Micro-Influencer Perception Report - Shiseido, Lancôme, and Estée Lauder'
+const ogTitle = 'Beauty Brand Perception Report: Shiseido, Lancôme & Estée Lauder | Senvio'
 const ogDescription =
-  'Comprehensive analysis of brand perception among micro-influencers across Japan, France, and the United States. Insights on purchase drivers, product categories, collaboration interests, and more.'
+  'Explore insights from 180 micro-influencers across Japan, France, and the US. Discover what drives purchases, preferred product categories, collaboration interests, and how consumers discover new launches for three leading beauty brands.'
 const ogUrl = computed(() => {
   return 'https://senvio.app' + route.path
 })

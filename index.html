@@ -27,6 +27,50 @@
     <meta name="twitter:description" content="Get real insights from influencers — powered by A.I. Senvio uses artificial intelligence to survey hundreds of influencers and deliver high-quality, actionable insights about your brand or business." />
     <meta name="twitter:image" content="https://senvio.app/img/market-research-1200.jpg" />
    
+    <!-- Dynamic Meta Tags for Demo Report -->
+    <script>
+      (function() {
+        // Check if we're on the demo-report route
+        if (window.location.pathname === '/demo-report' || window.location.pathname === '/demo-report/') {
+          // Update title
+          document.title = 'Beauty Brand Perception Report: Shiseido, Lancôme & Estée Lauder | Senvio';
+          
+          // Function to update or create meta tag
+          function setMetaTag(property, content, isProperty) {
+            const attribute = isProperty ? 'property' : 'name';
+            let meta = document.querySelector('meta[' + attribute + '="' + property + '"]');
+            if (!meta) {
+              meta = document.createElement('meta');
+              meta.setAttribute(attribute, property);
+              document.head.appendChild(meta);
+            }
+            meta.setAttribute('content', content);
+          }
+          
+          const ogTitle = 'Beauty Brand Perception Report: Shiseido, Lancôme & Estée Lauder | Senvio';
+          const ogDescription = 'Explore insights from 180 micro-influencers across Japan, France, and the US. Discover what drives purchases, preferred product categories, collaboration interests, and how consumers discover new launches for three leading beauty brands.';
+          const ogUrl = 'https://senvio.app/demo-report';
+          const ogImage = 'https://senvio.app/img/market-research-1200.jpg';
+          
+          // Update meta tags
+          setMetaTag('title', ogTitle, false);
+          setMetaTag('description', ogDescription, false);
+          setMetaTag('og:type', 'website', true);
+          setMetaTag('og:url', ogUrl, true);
+          setMetaTag('og:title', ogTitle, true);
+          setMetaTag('og:description', ogDescription, true);
+          setMetaTag('og:image', ogImage, true);
+          setMetaTag('og:image:width', '1200', true);
+          setMetaTag('og:image:height', '630', true);
+          setMetaTag('og:site_name', 'Senvio', true);
+          setMetaTag('twitter:card', 'summary_large_image', false);
+          setMetaTag('twitter:url', ogUrl, false);
+          setMetaTag('twitter:title', ogTitle, false);
+          setMetaTag('twitter:description', ogDescription, false);
+          setMetaTag('twitter:image', ogImage, false);
+        }
+      })();
+    </script>
 
     <!-- Google Analytics --><!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JWTQRTPTK4"></script>
